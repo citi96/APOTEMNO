@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://c502l2l2l2l2"]
+[gd_scene load_steps=5 format=3 uid="uid://c502l2l2l2l2"]
 
 [ext_resource type="Script" uid="uid://3tpnwp76nbt1" path="res://scripts/SacrificeManager.cs" id="1_manager"]
 [ext_resource type="PackedScene" uid="uid://b4y1k1k1k1k1" path="res://scenes/Player.tscn" id="2_player"]
 [ext_resource type="Script" uid="uid://bwp8p4d15sgxh" path="res://scripts/InputBroker.cs" id="4_broker"]
+[ext_resource type="Script" uid="uid://5kafe5pgx44e" path="res://scripts/HealthManager.cs" id="5_health"]
 
 [node name="MockupRoom" type="Node2D"]
 
@@ -26,9 +27,37 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
+[node name="HealthDisplay" type="VBoxContainer" parent="CanvasLayer"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 220.0
+offset_bottom = 80.0
+
+[node name="Label" type="Label" parent="CanvasLayer/HealthDisplay"]
+layout_mode = 2
+text = "Displayed Health (Fake)"
+
+[node name="FakeHealthBar" type="ProgressBar" parent="CanvasLayer/HealthDisplay"]
+layout_mode = 2
+value = 100.0
+
+[node name="Label2" type="Label" parent="CanvasLayer/HealthDisplay"]
+layout_mode = 2
+text = "True Health (Debug)"
+
+[node name="TrueHealthBar" type="ProgressBar" parent="CanvasLayer/HealthDisplay"]
+modulate = Color(1, 0, 0, 1)
+layout_mode = 2
+value = 100.0
+
 [node name="SacrificeManager" type="Node" parent="." node_paths=PackedStringArray("SacrificeOverlay")]
 script = ExtResource("1_manager")
 SacrificeOverlay = NodePath("../CanvasLayer/SacrificeOverlay")
 
 [node name="InputBroker" type="Node" parent="."]
 script = ExtResource("4_broker")
+
+[node name="HealthManager" type="Node" parent="." node_paths=PackedStringArray("DisplayedBar", "TrueBar")]
+script = ExtResource("5_health")
+DisplayedBar = NodePath("../CanvasLayer/HealthDisplay/FakeHealthBar")
+TrueBar = NodePath("../CanvasLayer/HealthDisplay/TrueHealthBar")
