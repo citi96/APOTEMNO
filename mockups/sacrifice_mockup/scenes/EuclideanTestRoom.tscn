@@ -1,0 +1,68 @@
+[gd_scene load_steps=4 format=3 uid="uid://4ecxotvayjpa"]
+
+[ext_resource type="PackedScene" uid="uid://c8n2ifaisnm0" path="res://scenes/Portal.tscn" id="1_portal"]
+[ext_resource type="PackedScene" uid="uid://b4y1k1k1k1k1" path="res://scenes/Player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://bnuwry60o482h" path="res://scripts/SceneLinker.cs" id="3_linker"]
+
+[node name="EuclideanTestRoom" type="Node2D"]
+
+[node name="RoomA" type="Node2D" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="RoomA"]
+offset_left = -2000.0
+offset_top = -2000.0
+offset_right = 2000.0
+offset_bottom = 2000.0
+color = Color(0.2, 0.5, 1, 1)
+
+[node name="Label" type="Label" parent="RoomA"]
+offset_left = -100.0
+offset_top = -200.0
+offset_right = 100.0
+offset_bottom = -170.0
+text = "ROOM A (Infinite)"
+
+[node name="PortalA" parent="RoomA" instance=ExtResource("1_portal")]
+position = Vector2(400, 0)
+
+[node name="RoomB" type="Node2D" parent="."]
+position = Vector2(5000, 0)
+
+[node name="ColorRect" type="ColorRect" parent="RoomB"]
+offset_left = -2000.0
+offset_top = -2000.0
+offset_right = 2000.0
+offset_bottom = 2000.0
+scale = Vector2(1, 1.00694)
+color = Color(0.189977, 0.671117, 0, 1)
+
+[node name="Label" type="Label" parent="RoomB"]
+offset_left = -100.0
+offset_top = -200.0
+offset_right = 100.0
+offset_bottom = -170.0
+text = "ROOM B (Red Hell)"
+
+[node name="TargetMarker" type="Label" parent="RoomB"]
+modulate = Color(0, 1, 0, 1)
+offset_left = -380.0
+offset_top = -50.0
+offset_right = -300.0
+offset_bottom = -20.0
+text = "LOOK HERE"
+
+[node name="PortalB" parent="RoomB" instance=ExtResource("1_portal")]
+position = Vector2(-400, 0)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+zoom = Vector2(0.8, 0.8)
+
+[node name="Connections" type="Node" parent="."]
+
+[node name="Linker" type="Node" parent="." node_paths=PackedStringArray("PortalA", "PortalB", "PlayerCamera")]
+script = ExtResource("3_linker")
+PortalA = NodePath("../RoomA/PortalA")
+PortalB = NodePath("../RoomB/PortalB")
+PlayerCamera = NodePath("../Player/Camera2D")

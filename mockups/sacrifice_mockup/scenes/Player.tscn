@@ -6,6 +6,7 @@
 size = Vector2(40, 40)
 
 [node name="Player" type="CharacterBody2D"]
+z_index = 20
 script = ExtResource("1_script")
 
 [node name="ColorRect" type="ColorRect" parent="."]
