@@ -12,6 +12,7 @@ public partial class PlayerController : CharacterBody2D
     [Export] public float CrawlSpeedPenalty { get; set; } = 0.4f; // 40% of speed (60% reduction)
 
     [Export] public Camera2D PlayerCamera { get; set; }
+    [Export] public Node2D PlayerVisuals { get; set; } // For scaling sprite
     [Export] public CollisionShape2D PlayerCollider { get; set; }
     [Export] public RayCast2D InteractionRay { get; set; }
 

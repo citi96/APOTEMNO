@@ -16,15 +16,19 @@ public class CrawlingState : IPlayerState
         {
              // Temporary hack: Scale Y down? Or switch shape?
              // Safest for generic:
-             player.PlayerCollider.Scale = new Vector2(1, 0.5f);
+             player.PlayerCollider.Scale = new Vector2(1, 0.4f);
         }
         
-        // Camera logic
-        if (player.PlayerCamera != null)
+        if (player.PlayerVisuals != null)
         {
-            // Lower camera ? Zoom in?
-            player.PlayerCamera.Zoom = new Vector2(1.2f, 1.2f); // Feel closer to ground
+             player.PlayerVisuals.Scale = new Vector2(1, 0.4f);
         }
+        
+        // Camera logic - User feedback: "Zoom random". Disabling for now.
+        // if (player.PlayerCamera != null)
+        // {
+        //    player.PlayerCamera.Zoom = new Vector2(1.2f, 1.2f);
+        // }
     }
 
     public void Update(PlayerController player, double delta)
@@ -70,9 +74,14 @@ public class CrawlingState : IPlayerState
              player.PlayerCollider.Scale = new Vector2(1, 1);
         }
         
-        if (player.PlayerCamera != null)
+        if (player.PlayerVisuals != null)
         {
-            player.PlayerCamera.Zoom = new Vector2(1, 1);
+             player.PlayerVisuals.Scale = new Vector2(1, 1);
         }
+
+        // if (player.PlayerCamera != null)
+        // {
+        //     player.PlayerCamera.Zoom = new Vector2(1, 1);
+        // }
     }
 }

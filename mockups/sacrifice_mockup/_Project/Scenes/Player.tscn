@@ -5,9 +5,12 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(40, 40)
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("InteractionRay")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("PlayerCamera", "PlayerVisuals", "PlayerCollider", "InteractionRay")]
 z_index = 20
 script = ExtResource("1_f4q6g")
+PlayerCamera = NodePath("Camera2D")
+PlayerVisuals = NodePath("ColorRect")
+PlayerCollider = NodePath("CollisionShape2D")
 InteractionRay = NodePath("RayCast2D")
 
 [node name="ColorRect" type="ColorRect" parent="."]
@@ -24,3 +27,7 @@ target_position = Vector2(60, 0)
 collision_mask = 3
 hit_from_inside = true
 collide_with_areas = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.8, 0.8)
+position_smoothing_enabled = true

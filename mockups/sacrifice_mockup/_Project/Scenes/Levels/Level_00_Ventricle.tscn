@@ -1,0 +1,165 @@
+[gd_scene load_steps=13 format=3 uid="uid://biqv54tuaw06a"]
+
+[ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://sjwxce1crqny" path="res://_Project/Scenes/UI/NarrativeOverlay.tscn" id="2_ui"]
+[ext_resource type="Shader" uid="uid://c3olxtqh2fi2p" path="res://_Project/Art/Shaders/Dither.gdshader" id="3_dither"]
+[ext_resource type="Script" uid="uid://dy82g7s7fn3d5" path="res://_Project/Scripts/Systems/SanityManager.cs" id="4_sanity"]
+[ext_resource type="Script" uid="uid://2fd3g5atl03n" path="res://_Project/Scripts/Systems/Narrative/NarrativeTrigger.cs" id="5_trigger"]
+[ext_resource type="Script" uid="uid://dhw36r6we1uqt" path="res://_Project/Scripts/Systems/SacrificeDoor.cs" id="6_door"]
+[ext_resource type="PackedScene" uid="uid://dqkmyj042b4fj" path="res://_Project/Prefabs/SacrificeAltar.tscn" id="7_altar"]
+[ext_resource type="PackedScene" uid="uid://0f1ecrea1w63" path="res://_Project/Scenes/ShepardToneGenerator.tscn" id="8_hum"]
+[ext_resource type="Script" uid="uid://cq716vxke0v7s" path="res://_Project/Scripts/Systems/Infrasound.cs" id="9_infra"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dither"]
+shader = ExtResource("3_dither")
+shader_parameter/sanity = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
+size = Vector2(50, 200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(40, 200)
+
+[node name="Level_00_Ventricle" type="Node2D"]
+
+[node name="Environment" type="Node2D" parent="."]
+
+[node name="Floor" type="ColorRect" parent="Environment"]
+offset_left = -1000.0
+offset_top = -500.0
+offset_right = 3000.0
+offset_bottom = 500.0
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="WallTop" type="StaticBody2D" parent="Environment"]
+position = Vector2(0, -100)
+
+[node name="ColorRect" type="ColorRect" parent="Environment/WallTop"]
+offset_right = 2000.0
+offset_bottom = 20.0
+color = Color(0.27, 0.27, 0.27, 1)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/WallTop"]
+polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 20, 0, 20)
+
+[node name="WallBottom" type="StaticBody2D" parent="Environment"]
+position = Vector2(0, 100)
+
+[node name="ColorRect" type="ColorRect" parent="Environment/WallBottom"]
+offset_right = 2000.0
+offset_bottom = 20.0
+color = Color(0.27, 0.27, 0.27, 1)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/WallBottom"]
+polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 20, 0, 20)
+
+[node name="BlockingWall" type="StaticBody2D" parent="Environment"]
+position = Vector2(1000, -100)
+
+[node name="ColorRect" type="ColorRect" parent="Environment/BlockingWall"]
+offset_right = 20.0
+offset_bottom = 180.0
+color = Color(0.27, 0.27, 0.27, 1)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/BlockingWall"]
+polygon = PackedVector2Array(0, 0, 20, 0, 20, 180, 0, 180, 0, 0)
+
+[node name="TunnelTop" type="StaticBody2D" parent="Environment"]
+position = Vector2(1020, 60)
+
+[node name="ColorRect" type="ColorRect" parent="Environment/TunnelTop"]
+offset_right = 1000.0
+offset_bottom = 20.0
+color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/TunnelTop"]
+polygon = PackedVector2Array(0, 0, 1000, 0, 1000, 20, 0, 20)
+
+[node name="TunnelBottom" type="StaticBody2D" parent="Environment"]
+position = Vector2(1020, 100)
+
+[node name="ColorRect" type="ColorRect" parent="Environment/TunnelBottom"]
+offset_right = 1000.0
+offset_bottom = 20.0
+color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/TunnelBottom"]
+polygon = PackedVector2Array(0, 0, 1000, 0, 1000, 20, 0, 20)
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(100, 0)
+
+[node name="NarrativeOverlay" parent="." instance=ExtResource("2_ui")]
+
+[node name="PostProcess" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="Dither" type="ColorRect" parent="PostProcess"]
+material = SubResource("ShaderMaterial_dither")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SanityManager" type="Node" parent="." node_paths=PackedStringArray("PostProcessRect")]
+script = ExtResource("4_sanity")
+PostProcessRect = NodePath("../PostProcess/Dither")
+
+[node name="Triggers" type="Node2D" parent="."]
+
+[node name="TriggerStart" type="Area2D" parent="Triggers"]
+position = Vector2(300, 0)
+collision_layer = 0
+script = ExtResource("5_trigger")
+LineText = "Svegliati. La carne è pesante, vero?"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerStart"]
+shape = SubResource("RectangleShape2D_trigger")
+
+[node name="TriggerDoor" type="Area2D" parent="Triggers"]
+position = Vector2(900, 0)
+collision_layer = 0
+script = ExtResource("5_trigger")
+LineText = "Non puoi passare intero. Il passaggio è stretto."
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerDoor"]
+shape = SubResource("RectangleShape2D_trigger")
+
+[node name="TriggerEnd" type="Area2D" parent="Triggers"]
+position = Vector2(1500, 0)
+collision_layer = 0
+script = ExtResource("5_trigger")
+LineText = "Benvenuto a casa."
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerEnd"]
+shape = SubResource("RectangleShape2D_trigger")
+
+[node name="SacrificeDoor" type="StaticBody2D" parent="." node_paths=PackedStringArray("Visuals", "Collision")]
+position = Vector2(1000, 0)
+script = ExtResource("6_door")
+RequiredSacrifice = 1
+Visuals = NodePath("ColorRect")
+Collision = NodePath("CollisionShape2D")
+
+[node name="ColorRect" type="ColorRect" parent="SacrificeDoor"]
+offset_top = -100.0
+offset_right = 20.0
+offset_bottom = 100.0
+color = Color(0.5, 0, 0, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SacrificeDoor"]
+position = Vector2(10, 0)
+shape = SubResource("RectangleShape2D_door")
+
+[node name="SacrificeAltar" parent="." instance=ExtResource("7_altar")]
+position = Vector2(800, 0)
+SacrificeToPerform = 1
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="ShepardToneGenerator" parent="Audio" instance=ExtResource("8_hum")]
+
+[node name="InfrasoundGenerator" type="Node" parent="Audio"]
+script = ExtResource("9_infra")
