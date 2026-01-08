@@ -47,6 +47,11 @@ public class NormalState : IPlayerState
             velocity = velocity.MoveToward(Vector2.Zero, player.MovementSpeed);
         }
 
+        if (velocity != Vector2.Zero)
+        {
+             player.Rotation = velocity.Angle();
+        }
+
         player.Velocity = velocity;
     }
 
