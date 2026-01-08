@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://4ecxotvayjpa"]
+[gd_scene load_steps=5 format=3 uid="uid://4ecxotvayjpa"]
 
 [ext_resource type="PackedScene" uid="uid://c8n2ifaisnm0" path="res://scenes/Portal.tscn" id="1_portal"]
 [ext_resource type="PackedScene" uid="uid://b4y1k1k1k1k1" path="res://scenes/Player.tscn" id="2_player"]
 [ext_resource type="Script" uid="uid://bnuwry60o482h" path="res://scripts/SceneLinker.cs" id="3_linker"]
+[ext_resource type="PackedScene" path="res://scenes/ShepardToneGenerator.tscn" id="4_shepard"]
 
 [node name="EuclideanTestRoom" type="Node2D"]
 
@@ -58,6 +59,8 @@ position = Vector2(-400, 0)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 zoom = Vector2(0.8, 0.8)
+
+[node name="ShepardToneGenerator" parent="." instance=ExtResource("4_shepard")]
 
 [node name="Connections" type="Node" parent="."]
 
