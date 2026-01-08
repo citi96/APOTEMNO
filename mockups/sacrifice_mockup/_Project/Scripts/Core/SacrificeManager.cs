@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace SacrificeMockup;
+namespace Apotemno.Core;
 
 [GlobalClass]
 public partial class SacrificeManager : Node

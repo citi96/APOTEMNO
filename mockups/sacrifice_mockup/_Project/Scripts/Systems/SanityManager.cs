@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace SacrificeMockup;
+namespace Apotemno.Systems;
 
 [GlobalClass]
 public partial class SanityManager : Node

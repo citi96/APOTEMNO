@@ -1,20 +1,19 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=3 format=3 uid="uid://cjimm8gl2qcup"]
 
-[ext_resource type="Script" path="res://scripts/Player.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://x360qhd3hyhb" path="res://_Project/Scripts/Actors/Player/PlayerController.cs" id="1_f4q6g"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(40, 40)
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 20
-script = ExtResource("1_script")
+script = ExtResource("1_f4q6g")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 offset_left = -20.0
 offset_top = -20.0
 offset_right = 20.0
 offset_bottom = 20.0
-color = Color(1, 1, 1, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_1")

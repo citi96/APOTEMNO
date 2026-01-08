@@ -10,14 +10,14 @@ config_version=5
 
 [application]
 
-config/name="Sacrifice Mockup"
-run/main_scene="res://scenes/MockupRoom.tscn"
+config/name="APOTEMNO"
+run/main_scene="res://_Project/Scenes/MockupRoom.tscn"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
-[audio]
+[autoload]
 
-buses/default_bus_layout="res://default_bus_layout.tres"
+InputManagerGlobal="*res://_Project/Scripts/Core/InputManagerGlobal.cs"
 
 [dotnet]
 
