@@ -35,8 +35,10 @@ public partial class ShepardTone : Node
 
             var generator = new AudioStreamGenerator();
             generator.MixRate = 44100;
-            generator.BufferLength = 0.1f; // Short buffer for low latency
+            generator.BufferLength = 0.5f; // Increased buffer to prevent crackling (Underruns)
             player.Stream = generator;
+            player.Bus = "World"; // Route to Reverb Bus
+            player.VolumeDb = -80.0f; // Start silent to avoid pop
             player.Play();
             
             _playbacks[i] = (AudioStreamGeneratorPlayback)player.GetStreamPlayback();
@@ -57,77 +59,21 @@ public partial class ShepardTone : Node
 
         for (int i = 0; i < 3; i++)
         {
-            // Offset each voice by 1/3 of a cycle? 
-            // Better: Offset by Octaves. 
-            // A Shepard tone usually sweeps a range of ~10 octaves, or simplified 3.
-            // Let's model "Virtual Pitch".
-            
-            // Basic Logic:
-            // We want the Pitch to drop from 2.0 to 1.0 (or 4.0 to 0.5).
-            // Let's say we have 3 voices.
-            // Voice A: 4.0 -> 2.0
-            // Voice B: 2.0 -> 1.0
-            // Voice C: 1.0 -> 0.5
-            // But we need them to loop.
-            
-            // Continuous Logic: 
-            // Pitch(t) = 2^( 1 - (t + offset)%1 ) * BaseFreq ??
-            
-            // Let's calculate a "Cycle Offset" for 0, 1, 2
-            float offset = i / 3.0f;
-            float t = (progress + offset) % 1.0f; // 0 to 1
-            
-            // Downward Spiral: Pitch goes High -> Low
-            // 2^1 (2x) down to 2^0 (1x)? Or 2^2 down to 2^-1?
-            
-            // Logarithmic Drop: 2^(2 * (1-t)) -> from 4x to 1x?
-            // Let's try 2^(1 - t). Range: 2.0 -> 1.0.
-            // If we use 3 voices, we cover 3 octaves.
-            
-            // Let's do a wider range: 2^(2 - 2t). Range: 4.0 -> 1.0.
-            // Pitch Multiplier P = Mathf.Pow(2, 2.0f * (1.0f - t));
-            
-            // Actually, simplest Shepard is:
-            // Freq(t) = Base * 2^t. 
-            // We want loose range.
-            
-            float octavePos = (progress * 3.0f + i) % 3.0f; // 0.0 to 3.0
-            // We want the pitch to drop. So invert progress.
-            // float dropPos = 3.0f - octavePos; 
-            
-            // Let's stick to standard formula:
-            // Relative frequency P = 2^x where x is in [-1, 2] ?
-            
-            // Let's refine based on "Infinite Descent":
-            // 3 Voices.
-            // Voice 0 starts at Pitch 4. Drops to 0.5.
-            // Volume is peak at pitch 2-1, silent at 4 and 0.5.
-            
-            // Let's use a simpler parameter T which goes 0->1 repeatedly.
-            // Voice `i` has effective T_i = (T + i/3) % 1.
-            // PitchScale = Mathf.Pow(2, 2.0f - 3.0f * T_i); // Drops from 4 (2^2) to 0.5 (2^-1)
-            // Volume = BellCurve(T_i);
+            // ... (Pitch logic unchanged) ...
             
             float T_i = (progress + (float)i/3.0f) % 1.0f;
             
-            // Pitch: Drops from 4.0 to 0.5 (-1 octave)
-            // 2^(2 - 3*t)
-            // t=0 -> 2^2 = 4
-            // t=1 -> 2^-1 = 0.5
             float exponent = 2.0f - (3.0f * T_i);
             float pitch = Mathf.Pow(2, exponent);
             
             _players[i].PitchScale = pitch;
             
             // Volume: Bell Curve (Hanning Window style)
-            // Peak at t=0.5 (which is correct, middle of travel)
-            // 0 -> Silence, 1 -> Silence.
-            // Sin(t * PI)
             float vol = Mathf.Sin(T_i * Mathf.Pi);
             
             // Convert linear amplitude to db
             float db = Mathf.LinearToDb(vol);
-            _players[i].VolumeDb = db - 10.0f; // Global attenuation
+            _players[i].VolumeDb = db - 25.0f; // Significantly lowered to ensure headroom
             
             // Continually fill buffer
             FillBuffer(i);

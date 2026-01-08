@@ -1,0 +1,49 @@
+[gd_resource type="AudioBusLayout" load_steps=5 format=3 uid="uid://ckjkg3py4sq76"]
+
+[sub_resource type="AudioEffectReverb" id="AudioEffectReverb_world"]
+resource_name = "Reverb"
+room_size = 0.6
+wet = 0.4
+
+[sub_resource type="AudioEffectCompressor" id="AudioEffectCompressor_intruder"]
+resource_name = "Compressor"
+threshold = -15.0
+gain = 5.0
+release_ms = 100.0
+
+[sub_resource type="AudioEffectDistortion" id="AudioEffectDistortion_intruder"]
+resource_name = "Distortion"
+mode = 2
+drive = 0.2
+
+[sub_resource type="AudioEffectLowPassFilter" id="AudioEffectLowPassFilter_infra"]
+resource_name = "LowPassFilter"
+cutoff_hz = 120.0
+
+[resource]
+bus/1/name = &"World"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = 0.0
+bus/1/send = &"Master"
+bus/1/effect/0/effect = SubResource("AudioEffectReverb_world")
+bus/1/effect/0/enabled = true
+bus/2/name = &"Intruder"
+bus/2/solo = false
+bus/2/mute = false
+bus/2/bypass_fx = false
+bus/2/volume_db = 2.0
+bus/2/send = &"Master"
+bus/2/effect/0/effect = SubResource("AudioEffectCompressor_intruder")
+bus/2/effect/0/enabled = true
+bus/2/effect/1/effect = SubResource("AudioEffectDistortion_intruder")
+bus/2/effect/1/enabled = true
+bus/3/name = &"Infrasound"
+bus/3/solo = false
+bus/3/mute = false
+bus/3/bypass_fx = false
+bus/3/volume_db = 0.0
+bus/3/send = &"Master"
+bus/3/effect/0/effect = SubResource("AudioEffectLowPassFilter_infra")
+bus/3/effect/0/enabled = true

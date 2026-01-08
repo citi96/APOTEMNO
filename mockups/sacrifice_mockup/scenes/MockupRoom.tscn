@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://c502l2l2l2l2"]
 
 [ext_resource type="Script" uid="uid://3tpnwp76nbt1" path="res://scripts/SacrificeManager.cs" id="1_manager"]
-[ext_resource type="PackedScene" uid="uid://b4y1k1k1k1k1" path="res://scenes/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="2_player"]
 [ext_resource type="Script" uid="uid://bwp8p4d15sgxh" path="res://scripts/InputBroker.cs" id="4_broker"]
 [ext_resource type="Script" uid="uid://5kafe5pgx44e" path="res://scripts/HealthManager.cs" id="5_health"]
 [ext_resource type="Shader" uid="uid://c3olxtqh2fi2p" path="res://shaders/Dither.gdshader" id="6_shader"]
