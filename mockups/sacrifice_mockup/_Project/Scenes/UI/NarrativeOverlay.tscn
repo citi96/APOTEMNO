@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3 uid="uid://narrativeoverlay123"]
+
+[ext_resource type="Script" path="res://_Project/Scripts/UI/NarrativeOverlay.cs" id="1_script"]
+
+[node name="NarrativeOverlay" type="CanvasLayer" node_paths=PackedStringArray("SubtitleLabel")]
+layer = 128
+script = ExtResource("1_script")
+SubtitleLabel = NodePath("Control/SubtitleLabel")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SubtitleLabel" type="RichTextLabel" parent="Control"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -180.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+bbcode_enabled = true
+text = "[center]Example Text[/center]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 2

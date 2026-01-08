@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 InputManagerGlobal="*res://_Project/Scripts/Core/InputManagerGlobal.cs"
 SacrificeManagerGlobal="*res://_Project/Scripts/Core/SacrificeManagerGlobal.cs"
+NarrativeManagerGlobal="*res://_Project/Scripts/Core/Narrative/NarrativeManagerGlobal.cs"
 
 [dotnet]
 

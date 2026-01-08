@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Apotemno.Core.Narrative;
 
 namespace Apotemno.Core;
 
@@ -60,6 +61,25 @@ public partial class SacrificeManagerGlobal : Node
 
         // Notify the world
         EmitSignal(SignalName.SacrificePerformed, (int)type);
+
+        // NARRATIVE REACTION
+        if (NarrativeManagerGlobal.Instance != null)
+        {
+            if (type == SacrificeType.Legs)
+            {
+                // LOAD AUDIO
+                AudioStream voiceClip = GD.Load<AudioStream>("res://_Project/Audio/Voices/test_voice.mp3");
+                
+                NarrativeManagerGlobal.Instance.PlayLine(
+                    new DialogueFragment(
+                        "[center][wave amp=50 freq=2]Li senti? Stanno ridendo di te.[/wave] Guarda come strisci. Patetico.[/center]", 
+                        5.0f,
+                        voiceClip,
+                        true
+                    )
+                );
+            }
+        }
     }
     
     // Debug helper

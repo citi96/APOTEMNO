@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c502l2l2l2l2"]
+[gd_scene load_steps=13 format=3 uid="uid://c502l2l2l2l2"]
 
 [ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
 [ext_resource type="Script" uid="uid://v5fnl6kves40" path="res://_Project/Scripts/Core/InputManagerGlobal.cs" id="4_broker"]
@@ -6,6 +6,9 @@
 [ext_resource type="Shader" uid="uid://c3olxtqh2fi2p" path="res://_Project/Art/Shaders/Dither.gdshader" id="6_shader"]
 [ext_resource type="PackedScene" uid="uid://dqkmyj042b4fj" path="res://_Project/Prefabs/SacrificeAltar.tscn" id="7_ktmjh"]
 [ext_resource type="Script" uid="uid://dy82g7s7fn3d5" path="res://_Project/Scripts/Systems/SanityManager.cs" id="7_sanity"]
+[ext_resource type="PackedScene" uid="uid://sjwxce1crqny" path="res://_Project/Scenes/UI/NarrativeOverlay.tscn" id="8_narrative"]
+[ext_resource type="PackedScene" uid="uid://0f1ecrea1w63" path="res://_Project/Scenes/ShepardToneGenerator.tscn" id="9_audio1"]
+[ext_resource type="Script" uid="uid://cq716vxke0v7s" path="res://_Project/Scripts/Systems/Infrasound.cs" id="10_audio2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dither"]
 shader = ExtResource("6_shader")
@@ -62,6 +65,8 @@ modulate = Color(1, 0, 0, 1)
 layout_mode = 2
 value = 100.0
 
+[node name="NarrativeOverlay" parent="." instance=ExtResource("8_narrative")]
+
 [node name="PostProcess" type="CanvasLayer" parent="."]
 layer = 100
 
@@ -93,3 +98,8 @@ PostProcessRect = NodePath("../PostProcess/DitherFilter")
 [node name="SacrificeAltar" parent="." instance=ExtResource("7_ktmjh")]
 position = Vector2(809, 348)
 SacrificeToPerform = 1
+
+[node name="ShepardToneGenerator" parent="." instance=ExtResource("9_audio1")]
+
+[node name="InfrasoundGenerator" type="Node" parent="."]
+script = ExtResource("10_audio2")
