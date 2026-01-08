@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://0f1ecrea1w63"]
 
-[ext_resource type="Script" uid="uid://dt3j1oic040h6" path="res://_Project/Scripts/Systems/ShepardTone.cs" id="1_shepard"]
+[ext_resource type="Script" uid="uid://cfmvxgfad8feb" path="res://_Project/Scripts/Systems/ShepardTone.cs" id="1_shepard"]
 
 [node name="ShepardToneGenerator" type="Node"]
 script = ExtResource("1_shepard")

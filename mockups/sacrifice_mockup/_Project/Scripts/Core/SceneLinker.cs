@@ -3,6 +3,8 @@ using System;
 
 namespace Apotemno.Core;
 
+using Apotemno.Systems;
+
 [GlobalClass]
 public partial class SceneLinker : Node
 {

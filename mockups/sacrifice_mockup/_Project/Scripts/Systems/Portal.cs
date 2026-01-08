@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Apotemno.Actors.Player;
 
 namespace Apotemno.Systems;
 
@@ -93,7 +94,7 @@ public partial class Portal : Node2D
 
     private void OnBodyEntered(Node body)
     {
-        if (body is Player player && Destination != null)
+        if (body is PlayerController player && Destination != null)
         {
             ulong now = Time.GetTicksMsec();
             if (now - _lastTeleportTime < TELEPORT_COOLDOWN_MS) return;

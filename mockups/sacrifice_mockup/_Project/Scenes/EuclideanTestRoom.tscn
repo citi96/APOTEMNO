@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://4ecxotvayjpa"]
 
 [ext_resource type="PackedScene" uid="uid://c8n2ifaisnm0" path="res://_Project/Scenes/Portal.tscn" id="1_portal"]
-[ext_resource type="PackedScene" path="res://_Project/Scenes/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
 [ext_resource type="Script" uid="uid://2dl8e2mybit3" path="res://_Project/Scripts/Core/SceneLinker.cs" id="3_linker"]
 [ext_resource type="PackedScene" uid="uid://0f1ecrea1w63" path="res://_Project/Scenes/ShepardToneGenerator.tscn" id="4_shepard"]
 [ext_resource type="Script" uid="uid://cq716vxke0v7s" path="res://_Project/Scripts/Systems/Infrasound.cs" id="5_infra"]

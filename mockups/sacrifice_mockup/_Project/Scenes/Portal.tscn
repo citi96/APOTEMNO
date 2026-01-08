@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c8n2ifaisnm0"]
 
-[ext_resource type="Script" uid="uid://gp7j2f8yuul" path="res://_Project/Scripts/Systems/Portal.cs" id="1_portal"]
+[ext_resource type="Script" uid="uid://beggosduuqk1v" path="res://_Project/Scripts/Systems/Portal.cs" id="1_portal"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_portal"]
 size = Vector2(50, 100)
