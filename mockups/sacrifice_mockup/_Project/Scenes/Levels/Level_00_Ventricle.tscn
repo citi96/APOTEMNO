@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://biqv54tuaw06a"]
+[gd_scene load_steps=15 format=3 uid="uid://biqv54tuaw06a"]
 
 [ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://sjwxce1crqny" path="res://_Project/Scenes/UI/NarrativeOverlay.tscn" id="2_ui"]
@@ -7,8 +7,15 @@
 [ext_resource type="Script" uid="uid://2fd3g5atl03n" path="res://_Project/Scripts/Systems/Narrative/NarrativeTrigger.cs" id="5_trigger"]
 [ext_resource type="Script" uid="uid://dhw36r6we1uqt" path="res://_Project/Scripts/Systems/SacrificeDoor.cs" id="6_door"]
 [ext_resource type="PackedScene" uid="uid://dqkmyj042b4fj" path="res://_Project/Prefabs/SacrificeAltar.tscn" id="7_altar"]
+[ext_resource type="PackedScene" uid="uid://bewi0cvjtgiu7" path="res://_Project/Prefabs/Enemies/Faceless.tscn" id="7_enemy"]
 [ext_resource type="PackedScene" uid="uid://0f1ecrea1w63" path="res://_Project/Scenes/ShepardToneGenerator.tscn" id="8_hum"]
 [ext_resource type="Script" uid="uid://cq716vxke0v7s" path="res://_Project/Scripts/Systems/Infrasound.cs" id="9_infra"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_floor"]
+vertices = PackedVector2Array(2045, 145, 2975, 475, -975, 475, -25, 145, 2975, -475, 2045, 35, -975, -475, -25, 75, 1045, 35, 1045, -55, 2025, -55, 2025, -125, -25, -125, -25, -55, 975, -55, 975, 75)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 1, 0, 5), PackedInt32Array(3, 2, 6, 7), PackedInt32Array(5, 8, 9, 10), PackedInt32Array(4, 5, 10, 11), PackedInt32Array(6, 4, 11, 12), PackedInt32Array(13, 14, 15, 7), PackedInt32Array(13, 7, 6), PackedInt32Array(6, 12, 13)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-1000, -500, 3000, -500, 3000, 500, -1000, 500)])
+agent_radius = 25.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_dither"]
 shader = ExtResource("3_dither")
@@ -22,68 +29,71 @@ size = Vector2(40, 200)
 
 [node name="Level_00_Ventricle" type="Node2D"]
 
-[node name="Environment" type="Node2D" parent="."]
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_floor")
 
-[node name="Floor" type="ColorRect" parent="Environment"]
+[node name="Environment" type="Node2D" parent="NavigationRegion2D"]
+
+[node name="Floor" type="ColorRect" parent="NavigationRegion2D/Environment"]
 offset_left = -1000.0
 offset_top = -500.0
 offset_right = 3000.0
 offset_bottom = 500.0
 color = Color(0.1, 0.1, 0.1, 1)
 
-[node name="WallTop" type="StaticBody2D" parent="Environment"]
+[node name="WallTop" type="StaticBody2D" parent="NavigationRegion2D/Environment"]
 position = Vector2(0, -100)
 
-[node name="ColorRect" type="ColorRect" parent="Environment/WallTop"]
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/Environment/WallTop"]
 offset_right = 2000.0
 offset_bottom = 20.0
 color = Color(0.27, 0.27, 0.27, 1)
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/WallTop"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="NavigationRegion2D/Environment/WallTop"]
 polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 20, 0, 20)
 
-[node name="WallBottom" type="StaticBody2D" parent="Environment"]
+[node name="WallBottom" type="StaticBody2D" parent="NavigationRegion2D/Environment"]
 position = Vector2(0, 100)
 
-[node name="ColorRect" type="ColorRect" parent="Environment/WallBottom"]
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/Environment/WallBottom"]
 offset_right = 2000.0
 offset_bottom = 20.0
 color = Color(0.27, 0.27, 0.27, 1)
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/WallBottom"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="NavigationRegion2D/Environment/WallBottom"]
 polygon = PackedVector2Array(0, 0, 2000, 0, 2000, 20, 0, 20)
 
-[node name="BlockingWall" type="StaticBody2D" parent="Environment"]
+[node name="BlockingWall" type="StaticBody2D" parent="NavigationRegion2D/Environment"]
 position = Vector2(1000, -100)
 
-[node name="ColorRect" type="ColorRect" parent="Environment/BlockingWall"]
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/Environment/BlockingWall"]
 offset_right = 20.0
 offset_bottom = 180.0
 color = Color(0.27, 0.27, 0.27, 1)
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/BlockingWall"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="NavigationRegion2D/Environment/BlockingWall"]
 polygon = PackedVector2Array(0, 0, 20, 0, 20, 180, 0, 180, 0, 0)
 
-[node name="TunnelTop" type="StaticBody2D" parent="Environment"]
+[node name="TunnelTop" type="StaticBody2D" parent="NavigationRegion2D/Environment"]
 position = Vector2(1020, 60)
 
-[node name="ColorRect" type="ColorRect" parent="Environment/TunnelTop"]
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/Environment/TunnelTop"]
 offset_right = 1000.0
 offset_bottom = 20.0
 color = Color(0.2, 0.2, 0.2, 1)
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/TunnelTop"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="NavigationRegion2D/Environment/TunnelTop"]
 polygon = PackedVector2Array(0, 0, 1000, 0, 1000, 20, 0, 20)
 
-[node name="TunnelBottom" type="StaticBody2D" parent="Environment"]
+[node name="TunnelBottom" type="StaticBody2D" parent="NavigationRegion2D/Environment"]
 position = Vector2(1020, 100)
 
-[node name="ColorRect" type="ColorRect" parent="Environment/TunnelBottom"]
+[node name="ColorRect" type="ColorRect" parent="NavigationRegion2D/Environment/TunnelBottom"]
 offset_right = 1000.0
 offset_bottom = 20.0
 color = Color(0.2, 0.2, 0.2, 1)
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Environment/TunnelBottom"]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="NavigationRegion2D/Environment/TunnelBottom"]
 polygon = PackedVector2Array(0, 0, 1000, 0, 1000, 20, 0, 20)
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
@@ -156,6 +166,9 @@ shape = SubResource("RectangleShape2D_door")
 [node name="SacrificeAltar" parent="." instance=ExtResource("7_altar")]
 position = Vector2(800, 0)
 SacrificeToPerform = 1
+
+[node name="Faceless" parent="." instance=ExtResource("7_enemy")]
+position = Vector2(677, 248)
 
 [node name="Audio" type="Node" parent="."]
 

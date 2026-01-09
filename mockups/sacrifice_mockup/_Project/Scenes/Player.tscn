@@ -5,7 +5,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(40, 40)
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("PlayerCamera", "PlayerVisuals", "PlayerCollider", "InteractionRay")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("PlayerCamera", "PlayerVisuals", "PlayerCollider", "InteractionRay") groups=["Player"]]
 z_index = 20
 script = ExtResource("1_f4q6g")
 PlayerCamera = NodePath("Camera2D")
