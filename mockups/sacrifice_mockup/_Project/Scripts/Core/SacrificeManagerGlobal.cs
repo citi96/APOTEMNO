@@ -9,11 +9,13 @@ namespace Apotemno.Core;
 public enum SacrificeType
 {
     None,
-    Legs, // Forces Crawling
-    Eyes, // Blinding / Dither intensity
-    Voice, // Mutes microphone input (future)
-    Hands, // Disables interaction? (future)
-    Memory // Disables Manual Saves, enables Random Autosaves
+    RightEye,     // Partial Blindness / UI Glitches
+    TemporalLobe, // Memory Loss / Save Corruption
+    RightArm,     // Weapon Handling Nerf / Interaction
+    Legs,         // Forced Crawling
+    VocalCords,   // Mute Mic / Narrative Silence
+    Skin,         // Sensitivity / Damage Multiplier?
+    LeftEar       // Mono Audio / Hallucinations
 }
 
 [GlobalClass]
@@ -23,18 +25,16 @@ public partial class SacrificeManagerGlobal : Node
 
     [Signal]
     public delegate void SacrificePerformedEventHandler(int typeInt); 
-    // Godot Signals don't love Enums directly in signatures nicely with C# sometimes, 
-    // keeping it int for safety or we can cast. Let's try explicit enum but fallback to int if needed.
-    // Actually, C# signals work fine with Enums usually.
-    // public delegate void SacrificePerformedEventHandler(SacrificeType type);
 
-    private HashSet<SacrificeType> _sacrifices = new HashSet<SacrificeType>();
+    private HashSet<SacrificeType> _performedSacrifices = new HashSet<SacrificeType>();
+    private Dictionary<SacrificeType, SacrificeOption> _registry = new Dictionary<SacrificeType, SacrificeOption>();
 
     public override void _EnterTree()
     {
         if (Instance == null)
         {
             Instance = this;
+            LoadRegistry();
         }
         else
         {
@@ -42,23 +42,49 @@ public partial class SacrificeManagerGlobal : Node
         }
     }
 
+    private void LoadRegistry()
+    {
+        // For now, we can load from a specific folder, or manually assign in Editor if we make this a scene.
+        // Best practice for pure code Autoload: Load from "res://_Project/Resources/Sacrifices/" directory.
+        // Assuming simple for now: distinct resources.
+        // Implementation Note: Since we don't have the files yet, we will rely on manual registration or lazy loading.
+        // Let's assume we expect them to be loaded.
+        GD.Print("[LITURGY] Sacrifice Manager Initialized.");
+    }
+    
+    // Helper to register an option (called by bootstrapper or loaded manually)
+    public void RegisterOption(SacrificeOption option)
+    {
+        if (option == null) return;
+        if (!_registry.ContainsKey(option.Type))
+        {
+            _registry.Add(option.Type, option);
+        }
+    }
+
     public bool HasSacrificed(SacrificeType type)
     {
-        return _sacrifices.Contains(type);
+        return _performedSacrifices.Contains(type);
+    }
+    
+    public SacrificeOption GetSacrificeInfo(SacrificeType type)
+    {
+        if (_registry.ContainsKey(type)) return _registry[type];
+        return null;
     }
 
     public void PerformSacrifice(SacrificeType type)
     {
         if (type == SacrificeType.None) return;
 
-        if (_sacrifices.Contains(type))
+        if (_performedSacrifices.Contains(type))
         {
             GD.Print($"[LITURGY] Sacrifice of {type} already performed. Ignoring.");
             return;
         }
 
         GD.Print($"[LITURGY] SACRIFICE PERFORMED: {type}");
-        _sacrifices.Add(type);
+        _performedSacrifices.Add(type);
 
         // Notify the world
         EmitSignal(SignalName.SacrificePerformed, (int)type);
@@ -66,27 +92,40 @@ public partial class SacrificeManagerGlobal : Node
         // NARRATIVE REACTION
         if (NarrativeManagerGlobal.Instance != null)
         {
+            // Simple hardcoded reaction for now, but could be moved to the Resource!
             if (type == SacrificeType.Legs)
             {
-                // LOAD AUDIO
-                AudioStream voiceClip = GD.Load<AudioStream>("res://_Project/Audio/Voices/test_voice.mp3");
-                
-                NarrativeManagerGlobal.Instance.PlayLine(
-                    new DialogueFragment(
-                        "[center][wave amp=50 freq=2]Li senti? Stanno ridendo di te.[/wave] Guarda come strisci. Patetico.[/center]", 
-                        5.0f,
-                        voiceClip,
-                        true
-                    )
-                );
+                 // Play reaction
             }
+        }
+        
+        // Apply Gameplay Effects Immediately
+        ApplySacrificeEffects(type);
+    }
+    
+    private void ApplySacrificeEffects(SacrificeType type)
+    {
+        // Centralized effect application
+        switch(type)
+        {
+            case SacrificeType.Legs:
+                // Notification handled by PlayerController listening to signal usually, 
+                // but we can also force it here if we have reference.
+                break;
+            case SacrificeType.TemporalLobe:
+                // Wipe Saves
+                if (Apotemno.Systems.SaveSystem.Instance != null)
+                {
+                    // Logic to corrupt saves
+                    GD.Print("[LITURGY] Memories dissolving...");
+                }
+                break;
         }
     }
     
-    // Debug helper
     public void ResetSacrifices()
     {
-        _sacrifices.Clear();
+        _performedSacrifices.Clear();
         GD.Print("[LITURGY] All sins washed away (Debug Reset).");
     }
 }
