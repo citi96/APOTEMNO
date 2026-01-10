@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SacrificeOption" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://_Project/Scripts/Core/SacrificeOption.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "sacrifice_right_eye"
+Type = 1
+DisplayName = "Right Eye"
+Description = "Sacrifice your peripheral vision. The unseen will manifest more frequently.
+Effect: Partial Blindness, Increased Glitches."

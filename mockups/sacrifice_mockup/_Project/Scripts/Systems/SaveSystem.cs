@@ -41,7 +41,7 @@ public partial class SaveSystem : Node
     public void SaveGame(int slot)
     {
         // 1. Check Condition: Memory Sacrifice
-        if (SacrificeManagerGlobal.Instance.HasSacrificed(SacrificeType.Memory))
+        if (SacrificeManagerGlobal.Instance.HasSacrificed(SacrificeType.TemporalLobe))
         {
             GD.Print("[SAVE] Manual Save BLOCKED by Memory Sacrifice. Only Autosaves allowed.");
             // UI Feedback: "You cannot hold onto this memory..."

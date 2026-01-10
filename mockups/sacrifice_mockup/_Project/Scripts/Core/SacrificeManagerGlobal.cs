@@ -44,12 +44,32 @@ public partial class SacrificeManagerGlobal : Node
 
     private void LoadRegistry()
     {
-        // For now, we can load from a specific folder, or manually assign in Editor if we make this a scene.
-        // Best practice for pure code Autoload: Load from "res://_Project/Resources/Sacrifices/" directory.
-        // Assuming simple for now: distinct resources.
-        // Implementation Note: Since we don't have the files yet, we will rely on manual registration or lazy loading.
-        // Let's assume we expect them to be loaded.
-        GD.Print("[LITURGY] Sacrifice Manager Initialized.");
+        string path = "res://_Project/Resources/Sacrifices/";
+        using var dir = DirAccess.Open(path);
+        if (dir != null)
+        {
+            dir.ListDirBegin();
+            string fileName = dir.GetNext();
+            while (fileName != "")
+            {
+                if (!dir.CurrentIsDir() && (fileName.EndsWith(".tres") || fileName.EndsWith(".remap")))
+                {
+                    // Handle .remap for exported builds if needed, but for now stick to .tres trimming
+                    string loadPath = path + fileName.Replace(".remap", "");
+                    var res = GD.Load<SacrificeOption>(loadPath);
+                    if (res != null)
+                    {
+                        RegisterOption(res);
+                        GD.Print($"[LITURGY] Registered Sacrifice: {res.DisplayName}");
+                    }
+                }
+                fileName = dir.GetNext();
+            }
+        }
+        else
+        {
+            GD.PrintErr($"[LITURGY] Failed to open sacrifice directory: {path}");
+        }
     }
     
     // Helper to register an option (called by bootstrapper or loaded manually)
@@ -60,6 +80,19 @@ public partial class SacrificeManagerGlobal : Node
         {
             _registry.Add(option.Type, option);
         }
+    }
+
+    public List<SacrificeOption> GetAvailableSacrifices()
+    {
+        List<SacrificeOption> available = new List<SacrificeOption>();
+        foreach(var kvp in _registry)
+        {
+            if (!HasSacrificed(kvp.Key))
+            {
+                available.Add(kvp.Value);
+            }
+        }
+        return available;
     }
 
     public bool HasSacrificed(SacrificeType type)

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://d1ri6nlibsjbo"]
+
+[ext_resource type="Script" uid="uid://71xxfrr6fi55" path="res://_Project/Scripts/Core/SacrificeOption.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "sacrifice_legs"
+Type = 4
+DisplayName = "Thighs & Calves"
+Description = "Offer your mobility to the earth.
+Effect: Forced Crawling State. Cannot Run."

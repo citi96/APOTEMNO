@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cjimm8gl2qcup"]
+[gd_scene load_steps=9 format=3 uid="uid://cjimm8gl2qcup"]
 
 [ext_resource type="Script" uid="uid://x360qhd3hyhb" path="res://_Project/Scripts/Actors/Player/PlayerController.cs" id="1_controller"]
 [ext_resource type="Script" uid="uid://bujvqvhre31b8" path="res://_Project/Scripts/Systems/HealthManager.cs" id="2_health"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://gunprefab001" path="res://_Project/Scenes/Items/Gun.tscn" id="4_gun"]
 [ext_resource type="PackedScene" uid="uid://sanityfx001" path="res://_Project/Scenes/UI/SanityEffects.tscn" id="5_sanity"]
 [ext_resource type="Script" uid="uid://bjdggt7cbjopk" path="res://_Project/Scripts/UI/DemiurgeDebugUI.cs" id="6_debugui"]
+[ext_resource type="PackedScene" uid="uid://cy2b5rh41st8c" path="res://_Project/Scenes/UI/SacrificeMenu.tscn" id="7_menu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
@@ -37,6 +38,8 @@ collide_with_areas = true
 script = ExtResource("2_health")
 
 [node name="SanityEffects" parent="." instance=ExtResource("5_sanity")]
+
+[node name="SacrificeMenu" parent="." instance=ExtResource("7_menu")]
 
 [node name="DemiurgeDebug" type="CanvasLayer" parent="."]
 script = ExtResource("6_debugui")
