@@ -65,4 +65,31 @@ public partial class HUDController : Control
         
         GD.Print("[HUD] Right Eye Blindness Applied.");
     }
+    private ColorRect _chronicPainOverlay;
+    private float _painPulseTime;
+
+    public void EnableChronicPainEffect()
+    {
+        // "Effetto Schermo Rosso: attiva un overlay visivo di dolore costante"
+        _chronicPainOverlay = new ColorRect();
+        _chronicPainOverlay.Name = "ChronicPainOverlay";
+        _chronicPainOverlay.Color = new Color(0.8f, 0, 0, 0.0f); // Red, starts invisible
+        _chronicPainOverlay.LayoutMode = 1;
+        _chronicPainOverlay.AnchorsPreset = (int)LayoutPreset.FullRect;
+        _chronicPainOverlay.MouseFilter = MouseFilterEnum.Ignore; // Crucial
+
+        AddChild(_chronicPainOverlay);
+        GD.Print("[HUD] Chronic Pain Effect Applied.");
+    }
+
+    public override void _Process(double delta)
+    {
+        if (_chronicPainOverlay != null)
+        {
+            _painPulseTime += (float)delta * 2.0f; // Speed of pulse
+            // Sin wave from 0.05 to 0.2 alpha (subtle but visible)
+            float alpha = 0.05f + (Mathf.Sin(_painPulseTime) + 1.0f) * 0.075f; 
+            _chronicPainOverlay.Color = new Color(0.8f, 0, 0, alpha);
+        }
+    }
 }

@@ -99,12 +99,8 @@ public partial class PlayerController : CharacterBody3D
         GD.Print("[PLAYER] DIED! (Logic TBD - Respawn/Game Over)");
     }
     
-    public void TakeDamage(float amount) => HealthSystem?.TakeDamage(amount);
-    public void Heal(float amount) => HealthSystem?.Heal(amount);
-
     public bool HasRightEye { get; private set; } = true;
 
-    // Public method for Manager to call
     public void ApplyEyeSacrifice()
     {
         if (!HasRightEye) return; // Already lost
@@ -115,8 +111,6 @@ public partial class PlayerController : CharacterBody3D
         // 1. Reduce Accuracy
         if (EquippedGun != null)
         {
-            // "riduci l’accuratezza... raddoppia la deviazione random"
-            // Let's set a base spread. If base is 0, we set to something 5.0f deg.
             float penalty = 15.0f; // Significant spread
             EquippedGun.CurrentSpread += penalty;
             GD.Print($"[VESSEL] Gun Spread increased to {EquippedGun.CurrentSpread}");
@@ -131,17 +125,52 @@ public partial class PlayerController : CharacterBody3D
         {
             GD.PrintErr("[VESSEL] Cannot apply Blindness Overlay: HUD is null!");
         }
+    }
 
-        // 3. TODO: Disable Enemy Indicators on Right Side (NarrativeManager / PerceptionSystem)
+    public bool HasSkin { get; private set; } = true;
+
+    // Apply Skin Sacrifice
+    public void ApplySkinSacrifice()
+    {
+        if (!HasSkin) return;
+        HasSkin = false;
+        GD.Print("[VESSEL] Skin Sacrificed. Vulnerability Doubled. Pain is Constant.");
+
+        // 1. Visual HUD Pain
+        HUD?.EnableChronicPainEffect();
+
+        // 2. Haptics (Started here, maintained in Process)
+        Input.StartJoyVibration(0, 0.1f, 0.1f, 0.0f); // Kickstart
+    }
+
+    // Intercept TakeDamage
+    public new void TakeDamage(float amount)
+    {
+        if (!HasSkin)
+        {
+            amount *= 2.0f; // "Danno Raddoppiato"
+            GD.Print($"[VESSEL] Skinless Agony! Damage doubled to {amount}");
+        }
+        HealthSystem?.TakeDamage(amount);
+    }
+    
+    // Add Haptics to PhysicsProcess or Process
+    public override void _Process(double delta)
+    {
+         if (!HasSkin)
+         {
+             // "Feedback Aptico Continuo... vibrazione costante a bassa intensità"
+             // Godot's vibration usually needs refreshing or it times out?
+             // StartJoyVibration: "If the duration is 0, it vibrates indefinitely." -> Actually duration 0 stops it usually?
+             // Documentation says duration in seconds. So we refresh it.
+             Input.StartJoyVibration(0, 0.05f, 0.1f, 0.1f); // Weak Rumble
+         }
     }
 
     private void OnMutilationOccurred(int typeInt)
     {
          var type = (SacrificeType)typeInt;
          if (type == SacrificeType.Legs) TransitionTo(StateCrawl);
-         // Note: We could handle RightEye here too, or let Manager call ApplyEyeSacrifice directly.
-         // Manager explicitly calls effects, so sticking to public method is fine or event is fine.
-         // If Manager calls ApplyEyeSacrifice via ApplySacrificeEffects, we don't need it here.
     }
 
     public override void _Input(InputEvent @event)
@@ -166,14 +195,6 @@ public partial class PlayerController : CharacterBody3D
     public override void _PhysicsProcess(double delta)
     {
         // Weapon Inputs (Polling)
-        if (Input.IsActionPressed("attack_primary"))
-        {
-             // Note: Gun has internal cooldown, so calling Shoot() every frame is fine if button held
-             // But Gun.Shoot uses JustPressed logic? No, Gun.Shoot checks cooldown.
-             // If we want semi-auto, use IsActionJustPressed.
-             // Requirement says "press button", usually implies semi-auto or click.
-        }
-        
         if (Input.IsActionJustPressed("attack_primary"))
         {
             GD.Print($"[CONTROLLER] Attack Primary Pressed. Gun: {EquippedGun?.Name ?? "NULL"}");

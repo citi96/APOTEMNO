@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SacrificeOption" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://_Project/Scripts/Core/SacrificeOption.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "sacrifice_skin"
+Type = 6
+DisplayName = "Skin"
+Description = "Peel away the boundary between you and the world.
+Effect: Double Damage Taken, Constant Pain (Screen & Rumble)."

@@ -158,6 +158,13 @@ public partial class SacrificeManagerGlobal : Node
                 // Notification handled by PlayerController listening to signal usually, 
                 // but we can also force it here if we have reference.
                 break;
+            case SacrificeType.Skin:
+                var skinPlayer = GetTree().GetFirstNodeInGroup("Player") as Actors.Player.PlayerController;
+                if (skinPlayer != null)
+                {
+                    skinPlayer.ApplySkinSacrifice();
+                }
+                break;
             case SacrificeType.TemporalLobe:
                 // Wipe Saves
                 if (Apotemno.Systems.SaveSystem.Instance != null)
