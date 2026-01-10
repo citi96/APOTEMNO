@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cjimm8gl2qcup"]
+[gd_scene load_steps=6 format=3 uid="uid://cjimm8gl2qcup"]
 
 [ext_resource type="Script" uid="uid://x360qhd3hyhb" path="res://_Project/Scripts/Actors/Player/PlayerController.cs" id="1_controller"]
 [ext_resource type="Script" uid="uid://bujvqvhre31b8" path="res://_Project/Scripts/Systems/HealthManager.cs" id="2_health"]
 [ext_resource type="PackedScene" uid="uid://bwm3rm5rkd0wh" path="res://_Project/Scenes/UI/HUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://gunprefab001" path="res://_Project/Scenes/Items/Gun.tscn" id="4_gun"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
@@ -13,6 +14,7 @@ PlayerCollider = NodePath("CollisionShape3D")
 InteractionRay = NodePath("Head/RayCast3D")
 HealthSystem = NodePath("HealthManager")
 HUD = NodePath("HUD")
+EquippedGun = NodePath("Head/Camera3D/Gun")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -22,6 +24,9 @@ shape = SubResource("CapsuleShape3D_player")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
+
+[node name="Gun" parent="Head/Camera3D" instance=ExtResource("4_gun")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, -0.2, -0.4)
 
 [node name="RayCast3D" type="RayCast3D" parent="Head"]
 target_position = Vector3(0, 0, -2)

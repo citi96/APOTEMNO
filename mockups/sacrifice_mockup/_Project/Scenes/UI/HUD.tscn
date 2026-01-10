@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://hudcs12345" path="res://_Project/Scripts/UI/HUDController.cs" id="1_hud"]
 
-[node name="HUD" type="Control" node_paths=PackedStringArray("RealHealthBar", "FakeHealthBar")]
+[node name="HUD" type="Control" node_paths=PackedStringArray("RealHealthBar", "FakeHealthBar", "AmmoLabel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,6 +13,7 @@ mouse_filter = 2
 script = ExtResource("1_hud")
 RealHealthBar = NodePath("DebugContainer/RealHealthBar")
 FakeHealthBar = NodePath("HealthContainer/FakeHealthBar")
+AmmoLabel = NodePath("AmmoLabel")
 
 [node name="HealthContainer" type="Control" parent="."]
 layout_mode = 1
@@ -76,3 +77,20 @@ offset_top = -5.0
 offset_right = 113.0
 offset_bottom = 18.0
 text = "REAL (DEBUG)"
+
+[node name="AmmoLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -150.0
+offset_right = -50.0
+offset_bottom = -110.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 40
+text = "6 / 6"
+horizontal_alignment = 2

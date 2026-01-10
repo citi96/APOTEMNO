@@ -8,14 +8,21 @@ public partial class HUDController : Control
 {
     [Export] public ProgressBar RealHealthBar;
     [Export] public ProgressBar FakeHealthBar;
+    [Export] public Label AmmoLabel;
 
     public void ConnectToPlayer(PlayerController player)
     {
         if (player.HealthSystem != null)
         {
             player.HealthSystem.HealthChanged += OnHealthChanged;
-            // Initialize
             OnHealthChanged(player.HealthSystem.RealHP, player.HealthSystem.FakeHP);
+        }
+
+        if (player.EquippedGun != null)
+        {
+            player.EquippedGun.AmmoChanged += OnAmmoChanged;
+            // Init
+            OnAmmoChanged(player.EquippedGun.CurrentAmmo, player.EquippedGun.MaxAmmo);
         }
     }
 
@@ -23,5 +30,13 @@ public partial class HUDController : Control
     {
         if (RealHealthBar != null) RealHealthBar.Value = real;
         if (FakeHealthBar != null) FakeHealthBar.Value = fake;
+    }
+
+    private void OnAmmoChanged(int current, int max)
+    {
+        if (AmmoLabel != null)
+        {
+            AmmoLabel.Text = $"{current} / {max}";
+        }
     }
 }

@@ -5,21 +5,24 @@ namespace Apotemno.Actors.Enemies;
 
 public partial class FacelessAI : CharacterBody3D
 {
+    [Export] public float MaxHealth = 100.0f;
     [Export] public float SpeedMultiplier = 1.8f;
     [Export] public float FovDotThreshold = 0.5f; // ~60 degrees cone
     
     [Export] public NavigationAgent3D NavAgent;
     [Export] public VisibleOnScreenNotifier3D VisNotifier;
     [Export] public AudioStreamPlayer3D StaticSound;
-    
-    // Aesthetic: Jitter the sprite when observed
-    [Export] public Node3D Visuals; // Was Node2D
+    [Export] public Node3D Visuals;
+
+    public float CurrentHealth { get; private set; }
 
     private PlayerController _targetPlayer;
     private bool _isObserved = false;
 
     public override void _Ready()
     {
+        CurrentHealth = MaxHealth;
+
         var players = GetTree().GetNodesInGroup("Player");
         if (players.Count > 0)
         {
@@ -37,6 +40,26 @@ public partial class FacelessAI : CharacterBody3D
         }
 
         Callable.From(ActorSetup).CallDeferred();
+    }
+
+    public void TakeDamage(float amount)
+    {
+        CurrentHealth -= amount;
+        GD.Print($"[FACELESS] Took hit! HP: {CurrentHealth}");
+        
+        // Pushback or Hit flash could go here
+
+        if (CurrentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        GD.Print("[FACELESS] Destroyed.");
+        // Play death sound/animation
+        QueueFree();
     }
 
     private async void ActorSetup()
@@ -117,8 +140,6 @@ public partial class FacelessAI : CharacterBody3D
         }
 
         // 2. Angle Check (Is player looking at me?)
-        // In 3D: Player Forward is -Z (usually) or calculated from Rotation.
-        // PlayerController uses RotateY. Forward is Basis.Z * -1 ?
         Vector3 playerLookDir = -_targetPlayer.GlobalTransform.Basis.Z;
 
         Vector3 toEnemy = (GlobalPosition - _targetPlayer.GlobalPosition).Normalized();

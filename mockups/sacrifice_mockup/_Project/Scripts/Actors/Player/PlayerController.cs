@@ -4,6 +4,7 @@ using Apotemno.Actors.Player.States;
 using Apotemno.Systems;
 using Apotemno.Systems.Interaction;
 using Apotemno.UI;
+using Apotemno.Items;
 
 namespace Apotemno.Actors.Player;
 
@@ -27,7 +28,8 @@ public partial class PlayerController : CharacterBody3D
 
     [ExportCategory("Systems")]
     [Export] public HealthManager HealthSystem { get; private set; }
-    [Export] public HUDController HUD { get; set; } // Direct reference for simple wiring
+    [Export] public HUDController HUD { get; set; }
+    [Export] public Gun EquippedGun { get; set; } // New Gun Reference
 
     // Stamina
     public float MaxStamina { get; set; } = 100f;
@@ -50,24 +52,34 @@ public partial class PlayerController : CharacterBody3D
         InputManager = InputBroker.Instance;
         Input.MouseMode = Input.MouseModeEnum.Captured;
 
+        // 1. Resolve Gun Reference FIRST (Manual Lookup if needed)
+        if (EquippedGun == null)
+        {
+            GD.PrintErr("[PLAYER] EquippedGun is NULL in _Ready! Attempting manual lookup...");
+            EquippedGun = GetNodeOrNull<Gun>("Head/Camera3D/Gun");
+            if (EquippedGun != null) GD.Print("[PLAYER] Manual lookup SUCCESS!");
+            else GD.PrintErr("[PLAYER] Manual lookup FAILED!");
+        }
+        else
+        {
+            GD.Print($"[PLAYER] EquippedGun Linked: {EquippedGun.Name}");
+        }
+
         StateNormal = new NormalState();
         StateCrawl = new CrawlingState();
         
         TransitionTo(StateNormal);
         
-        // Connect Health Signals
         if (HealthSystem != null)
         {
             HealthSystem.Died += OnPlayerDied;
         }
 
-        // Connect HUD
         if (HUD != null)
         {
             HUD.ConnectToPlayer(this);
         }
 
-        // Setup signals logic if needed (e.g. Sacrifice)
         if (SacrificeManagerGlobal.Instance != null)
         {
              SacrificeManagerGlobal.Instance.SacrificePerformed += OnMutilationOccurred;
@@ -85,20 +97,10 @@ public partial class PlayerController : CharacterBody3D
     private void OnPlayerDied()
     {
         GD.Print("[PLAYER] DIED! (Logic TBD - Respawn/Game Over)");
-        // Disable movement?
-        // TransitionTo(StateDead);
     }
     
-    // Proxy Methods for Health
-    public void TakeDamage(float amount)
-    {
-        HealthSystem?.TakeDamage(amount);
-    }
-    
-    public void Heal(float amount)
-    {
-        HealthSystem?.Heal(amount);
-    }
+    public void TakeDamage(float amount) => HealthSystem?.TakeDamage(amount);
+    public void Heal(float amount) => HealthSystem?.Heal(amount);
 
     private void OnMutilationOccurred(int typeInt)
     {
@@ -110,10 +112,8 @@ public partial class PlayerController : CharacterBody3D
     {
         if (@event is InputEventMouseMotion mouseMotion)
         {
-            // Yaw (Body)
             RotateY(-mouseMotion.Relative.X * MouseSensitivity);
             
-            // Pitch (Camera)
             if (PlayerCamera != null)
             {
                 PlayerCamera.RotateX(-mouseMotion.Relative.Y * MouseSensitivity);
@@ -126,7 +126,30 @@ public partial class PlayerController : CharacterBody3D
 
     public override void _PhysicsProcess(double delta)
     {
-        // Apply Gravity
+        // Weapon Inputs (Polling)
+        if (Input.IsActionPressed("attack_primary"))
+        {
+             // Note: Gun has internal cooldown, so calling Shoot() every frame is fine if button held
+             // But Gun.Shoot uses JustPressed logic? No, Gun.Shoot checks cooldown.
+             // If we want semi-auto, use IsActionJustPressed.
+             // Requirement says "press button", usually implies semi-auto or click.
+        }
+        
+        if (Input.IsActionJustPressed("attack_primary"))
+        {
+            GD.Print($"[CONTROLLER] Attack Primary Pressed. Gun: {EquippedGun?.Name ?? "NULL"}");
+            EquippedGun?.Shoot();
+        }
+
+        if (Input.IsActionJustPressed("reload"))
+        {
+             EquippedGun?.Reload();
+        }
+        else if (Input.IsKeyPressed(Key.R))
+        {
+             EquippedGun?.Reload();
+        }
+
         Vector3 velocity = Velocity;
         if (!IsOnFloor())
         {
@@ -137,7 +160,6 @@ public partial class PlayerController : CharacterBody3D
 
         _currentState?.PhysicsUpdate(this, delta);
         
-        // Stamina Logic
         HandleStamina(delta);
 
         MoveAndSlide();
