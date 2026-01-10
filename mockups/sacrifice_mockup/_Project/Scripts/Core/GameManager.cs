@@ -61,6 +61,10 @@ namespace Apotemno.Core
                 {
                     Apotemno.Systems.SaveSystem.Instance?.LoadGame(1);
                 }
+                else if (keyEvent.Keycode == Key.F6)
+                {
+                    Apotemno.Systems.SanitySystem.Instance?.DebugReduceSanity(10.0f);
+                }
             }
         }
 
