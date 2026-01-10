@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-InputManagerGlobal="*res://_Project/Scripts/Core/InputManagerGlobal.cs"
+InputBroker="*res://_Project/Scripts/Core/InputBroker.cs"
 SacrificeManagerGlobal="*res://_Project/Scripts/Core/SacrificeManagerGlobal.cs"
 NarrativeManagerGlobal="*res://_Project/Scripts/Core/Narrative/NarrativeManagerGlobal.cs"
 

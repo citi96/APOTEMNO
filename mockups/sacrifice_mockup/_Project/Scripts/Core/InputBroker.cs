@@ -4,59 +4,99 @@ using System;
 namespace Apotemno.Core;
 
 [GlobalClass]
-public partial class InputManagerGlobal : Node
+/// <summary>
+/// Central Input Broker for managing player input and injecting "Nervous System" effects (Inverted, Unreliable, Spasmodic).
+/// Functions as a thread-safe Singleton (though Godot Input API is Main Thread only).
+/// </summary>
+public partial class InputBroker : Node
 {
-    public static InputManagerGlobal Instance { get; private set; }
+    private static InputBroker _instance;
+    private static readonly object _instanceLock = new object();
+    
+    public static InputBroker Instance 
+    { 
+        get 
+        {
+            lock (_instanceLock)
+            {
+                return _instance;
+            }
+        }
+        private set
+        {
+            lock (_instanceLock)
+            {
+                _instance = value;
+            }
+        }
+    }
 
     // Events for UI and Systems to react to corruption changes
     [Signal] public delegate void InputStateChangedEventHandler(bool inverted, bool unreliable, bool spasmodic);
+
+    // Locks for thread-safe property access
+    private readonly object _stateLock = new object();
 
     // State Flags with backing fields to trigger events
     private bool _inverted;
     public bool Inverted
     {
-        get => _inverted;
+        get { lock (_stateLock) return _inverted; }
         set
         {
-            if (_inverted != value)
+            bool changed = false;
+            lock (_stateLock)
             {
-                _inverted = value;
-                EmitSignal(SignalName.InputStateChanged, _inverted, _unreliable, _spasmodic);
+                if (_inverted != value)
+                {
+                    _inverted = value;
+                    changed = true;
+                }
             }
+            if (changed) EmitSignal(SignalName.InputStateChanged, Inverted, Unreliable, Spasmodic);
         }
     }
 
     private bool _unreliable;
     public bool Unreliable
     {
-        get => _unreliable;
+        get { lock (_stateLock) return _unreliable; }
         set
         {
-            if (_unreliable != value)
+            bool changed = false;
+            lock (_stateLock)
             {
-                _unreliable = value;
-                EmitSignal(SignalName.InputStateChanged, _inverted, _unreliable, _spasmodic);
+                if (_unreliable != value)
+                {
+                    _unreliable = value;
+                    changed = true;
+                }
             }
+            if (changed) EmitSignal(SignalName.InputStateChanged, Inverted, Unreliable, Spasmodic);
         }
     }
 
     private bool _spasmodic;
     public bool Spasmodic
     {
-        get => _spasmodic;
+        get { lock (_stateLock) return _spasmodic; }
         set
         {
-            if (_spasmodic != value)
+            bool changed = false;
+            lock (_stateLock)
             {
-                _spasmodic = value;
-                EmitSignal(SignalName.InputStateChanged, _inverted, _unreliable, _spasmodic);
+                if (_spasmodic != value)
+                {
+                    _spasmodic = value;
+                    changed = true;
+                }
             }
+            if (changed) EmitSignal(SignalName.InputStateChanged, Inverted, Unreliable, Spasmodic);
         }
     }
 
     private Random _random = new Random();
-    private readonly object _lock = new object();
-
+    
     // Internal logic states
     private Vector2 _currentSpasm = Vector2.Zero;
     private double _spasmTimer = 0;
@@ -71,11 +111,11 @@ public partial class InputManagerGlobal : Node
 
     public override void _EnterTree()
     {
-        lock (_lock)
+        lock (_instanceLock)
         {
-            if (Instance == null)
+            if (_instance == null)
             {
-                Instance = this;
+                _instance = this;
             }
             else
             {
@@ -86,6 +126,9 @@ public partial class InputManagerGlobal : Node
 
     public override void _Process(double delta)
     {
+        // Internal logic states update - mostly safe to do in _Process (Main Thread)
+        // If we wanted full thread safety for logic, we'd lock specific logic updates too,
+        // but _Process is guaranteed main thread.
         UpdateChaosLogic(delta);
         HandleDebugToggles();
     }
@@ -119,8 +162,11 @@ public partial class InputManagerGlobal : Node
 
     private void UpdateChaosLogic(double delta)
     {
+        bool isSpasmodic = Spasmodic; // Local copy for consistent logic loop
+        bool isUnreliable = Unreliable;
+
         // Spasmodic Logic
-        if (Spasmodic)
+        if (isSpasmodic)
         {
             _spasmTimer += delta;
             if (_spasmTimer >= _nextSpasmTime)
@@ -141,7 +187,7 @@ public partial class InputManagerGlobal : Node
         }
 
         // Unreliable Logic
-        if (Unreliable)
+        if (isUnreliable)
         {
             _unreliableTimer += delta;
             if (_unreliableTimer > UNRELIABLE_CHECK_INTERVAL)
@@ -158,6 +204,8 @@ public partial class InputManagerGlobal : Node
 
     public Vector2 GetMovementVector()
     {
+        // Input API is thread-safe effectively by being main-thread restricted usually. 
+        // If called from another thread, Godot might complain, but our broker logic is consistent.
         Vector2 input = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
 
         if (Unreliable && _dropInputPacket)
@@ -170,9 +218,11 @@ public partial class InputManagerGlobal : Node
             input *= -1;
         }
 
-        if (Spasmodic && _currentSpasm != Vector2.Zero)
+        // Check spasms
+        Vector2 spasm = _currentSpasm; // Copy
+        if (Spasmodic && spasm != Vector2.Zero)
         {
-            input += _currentSpasm;
+            input += spasm;
             if (input.Length() > 1) input = input.Normalized();
         }
 
