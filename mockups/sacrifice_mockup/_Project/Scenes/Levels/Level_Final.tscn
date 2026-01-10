@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://level_final_act5"]
+
+[ext_resource type="PackedScene" uid="uid://player_controller_3d" path="res://_Project/Scenes/Player.tscn" id="2_player"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Void"]
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+
+[node name="Level_Final" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="Void" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
+flip_faces = true
+size = Vector3(100, 100, 100)
+material = SubResource("Mat_Void")
+
+[node name="Platform" type="CSGBox3D" parent="."]
+size = Vector3(10, 0.5, 10)
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -4)
+text = "THE END.
+YOU ARE WHOLE AGAIN,
+YET NOTHING REMAINS."
+font_size = 64
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)

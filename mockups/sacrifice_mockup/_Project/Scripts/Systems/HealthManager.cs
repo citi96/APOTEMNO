@@ -33,6 +33,7 @@ public partial class HealthManager : Node
     {
         HandleDebugInput();
         UpdateParanoiaLogic((float)delta);
+        UpdateCardiacDecay((float)delta);
         // We emit update every frame during paranoia/updates to animate the bar smoothly
         EmitHealthUpdate(); 
     }
@@ -139,8 +140,44 @@ public partial class HealthManager : Node
         }
     }
 
+    public float MaxHP { get; private set; } = 100.0f;
+
+    // Blood Sacrifice: Reduce Max HP
+    public void ApplyBloodSacrifice()
+    {
+        MaxHP *= 0.9f; // -10%
+        if (RealHP > MaxHP) RealHP = MaxHP;
+        GD.Print($"[HEALTH] Blood Sacrificed. MaxHP reduced to {MaxHP}");
+        EmitHealthUpdate();
+    }
+
+    // Heart Sacrifice: Decay and No Regen
+    private bool _cardiacArrest = false;
+    public void EnableCardiacArrest()
+    {
+        _cardiacArrest = true;
+        // "La salute scende a zero... non può più rigenerarsi"
+        // We set to 1 to allow a final moment, or let decay kill them.
+        GD.Print("[HEALTH] CARDIAC ARREST. Heart Sacrificed. Vitality fading...");
+    }
+
     private void EmitHealthUpdate()
     {
         EmitSignal(SignalName.HealthChanged, RealHP, FakeHP);
+    }
+
+    // Update Logic for Decay
+    private void UpdateCardiacDecay(float delta)
+    {
+        if (_cardiacArrest && RealHP > 0)
+        {
+            // Slow decay
+            RealHP -= delta * 0.5f; // 1 HP every 2 seconds
+            if (RealHP <= 0)
+            {
+                RealHP = 0;
+                EmitSignal(SignalName.Died);
+            }
+        }
     }
 }

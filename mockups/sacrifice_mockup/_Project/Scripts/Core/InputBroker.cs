@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 namespace Apotemno.Core;
 
@@ -253,6 +254,26 @@ public partial class InputBroker : Node
             input *= -1;
         }
 
+        // Latency Logic (Parietal Lobe)
+        if (InputLatencyFrames > 0)
+        {
+            _inputBuffer.Enqueue(input);
+            if (_inputBuffer.Count > InputLatencyFrames)
+            {
+                input = _inputBuffer.Dequeue();
+            }
+            else
+            {
+                // Not enough buffer yet
+                input = _lastBufferedInput; // Maintain last valid or zero
+            }
+        }
+        else
+        {
+             _inputBuffer.Clear(); // Optimization: clear if disabled
+        }
+        _lastBufferedInput = input;
+
 
         // Check spasms
         Vector2 spasm = _currentSpasm; // Copy
@@ -264,6 +285,10 @@ public partial class InputBroker : Node
 
         return input;
     }
+
+    private Queue<Vector2> _inputBuffer = new Queue<Vector2>();
+    private Vector2 _lastBufferedInput = Vector2.Zero;
+    public int InputLatencyFrames { get; set; } = 0;
 
     /// <summary>
     /// Triggers gamepad rumble/haptic feedback.

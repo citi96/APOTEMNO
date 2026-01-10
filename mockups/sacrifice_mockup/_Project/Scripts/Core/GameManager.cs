@@ -78,7 +78,7 @@ namespace Apotemno.Core
             Sanity = 100f;
             
             // TODO: Load the first real level. For now, using Level_00_Ventricle as prototype.
-            LoadLevel("res://_Project/Scenes/Levels/Level_00_Ventricle.tscn");
+            LoadLevel("res://_Project/Scenes/Levels/Level_Start.tscn");
         }
 
         public void LoadLevel(string levelPath)

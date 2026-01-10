@@ -256,6 +256,11 @@ public partial class PlayerController : CharacterBody3D
             {
                 var collider = InteractionRay.GetCollider();
                 GD.Print($"[INTERACTION] Ray hit: {((Node)collider).Name}");
+
+                if (collider is Apotemno.Systems.Interaction.SacrificeAltar altar)
+                {
+                    altar.OnInteract();
+                }
             }
         }
     }

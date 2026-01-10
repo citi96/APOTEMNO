@@ -15,10 +15,12 @@ public enum SacrificeType
     Legs,         // Forced Crawling
     VocalCords,   // Mute Mic / Narrative Silence
     Skin,         // Sensitivity / Damage Multiplier?
-    LeftEar       // Mono Audio / Hallucinations
+    LeftEar,      // Mono Audio / Hallucinations
+    Blood,        // Max HP Reduction
+    ParietalLobe, // Input Latency / Inversion
+    Heart         // Cardiac Arrest
 }
 
-[GlobalClass]
 public partial class SacrificeManagerGlobal : Node
 {
     public static SacrificeManagerGlobal Instance { get; private set; }
@@ -135,43 +137,56 @@ public partial class SacrificeManagerGlobal : Node
         // Apply Gameplay Effects Immediately
         ApplySacrificeEffects(type);
     }
-    
+
     private void ApplySacrificeEffects(SacrificeType type)
     {
         // Centralized effect application
         switch(type)
         {
             case SacrificeType.RightEye:
-                // Find Player and Apply Effect
+                // ... [Existing RightEye Code] ...
                 var player = GetTree().GetFirstNodeInGroup("Player") as Actors.Player.PlayerController;
-                if (player != null)
-                {
-                    player.ApplyEyeSacrifice();
-                }
-                else
-                {
-                    GD.PrintErr("[LITURGY] Could not find Player to apply Right Eye Sacrifice!");
-                    // Fallback: If player not found by Group, try path if relevant or just log
-                }
+                player?.ApplyEyeSacrifice();
                 break;
+
             case SacrificeType.Legs:
                 // Notification handled by PlayerController listening to signal usually, 
                 // but we can also force it here if we have reference.
                 break;
+            
             case SacrificeType.Skin:
                 var skinPlayer = GetTree().GetFirstNodeInGroup("Player") as Actors.Player.PlayerController;
-                if (skinPlayer != null)
+                skinPlayer?.ApplySkinSacrifice();
+                break;
+
+            case SacrificeType.TemporalLobe:
+                 // Memory Sacrifice (Functionality in SaveSystem)
+                 break;
+
+            case SacrificeType.Blood:
+                var healthBlood = GetTree().GetFirstNodeInGroup("HealthManager") as Apotemno.Systems.HealthManager;
+                // Or find via Player if HealthManager is child? Let's try Global or Player path.
+                // Assuming HealthManager is a child of Player for now based on scene structure.
+                var pBlood = GetTree().GetFirstNodeInGroup("Player");
+                var hBlood = pBlood?.GetNodeOrNull<Apotemno.Systems.HealthManager>("HealthManager");
+                hBlood?.ApplyBloodSacrifice();
+                break;
+
+            case SacrificeType.ParietalLobe:
+                var input = Apotemno.Core.InputBroker.Instance;
+                if (input != null)
                 {
-                    skinPlayer.ApplySkinSacrifice();
+                    input.InputLatencyFrames = 15; // 0.25s at 60fps
+                    input.Unreliable = true;
+                    input.Inverted = true; // "Invertire occasionalmente" -> Let's force it for impact, or use the Unreliable flag to toggle it.
+                    GD.Print("[LITURGY] Parietal Lobe Sacrificed. Coordination Severed.");
                 }
                 break;
-            case SacrificeType.TemporalLobe:
-                // Wipe Saves
-                if (Apotemno.Systems.SaveSystem.Instance != null)
-                {
-                    // Logic to corrupt saves
-                    GD.Print("[LITURGY] Memories dissolving...");
-                }
+
+            case SacrificeType.Heart:
+                var pHeart = GetTree().GetFirstNodeInGroup("Player");
+                var hHeart = pHeart?.GetNodeOrNull<Apotemno.Systems.HealthManager>("HealthManager");
+                hHeart?.EnableCardiacArrest();
                 break;
         }
     }

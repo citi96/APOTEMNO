@@ -1,52 +1,56 @@
 using Godot;
-using Apotemno.Actors.Player;
+using System;
+using Apotemno.Core; // For GameManager
 
 namespace Apotemno.Systems;
 
 [GlobalClass]
-public partial class Portal : Node3D // Changed to Node3D
+public partial class Portal : Area3D
 {
-    [Export]
-    public Node3D Destination; 
+    [Export(PropertyHint.File, "*.tscn")] public string TargetScenePath { get; set; }
+    [Export] public string TargetSpawnPointName { get; set; } = "SpawnPoint"; // Name of Node3D in next scene
 
-    [Export]
-    public Area3D TeleportArea;
+    // For Intra-Scene Teleportation (Non-Euclidean / Loops)
+    public Node3D Destination { get; set; }
 
     public override void _Ready()
     {
-        if (TeleportArea != null)
-        {
-            TeleportArea.BodyEntered += OnBodyEntered;
-        }
-        // Camera linking disabled for 3D refactor initially - requires RenderTarget/Mesh setup
+        BodyEntered += OnBodyEntered;
     }
 
-    private static ulong _lastTeleportTime = 0;
-    private const ulong TELEPORT_COOLDOWN_MS = 200;
-
-    public override void _Process(double delta)
+    private void OnBodyEntered(Node3D body)
     {
-        // Debug
-        if (Destination == null && Engine.GetFramesDrawn() % 60 == 0)
+        if (body is Actors.Player.PlayerController)
         {
-            GD.PrintErr($"[PORTAL] {Name}: DESTINATION IS NULL!");
+            GD.Print($"[PORTAL] Player entered portal.");
+            CallDeferred(nameof(Teleport), body);
         }
     }
 
-    private void OnBodyEntered(Node body)
+    private void Teleport(Node3D body)
     {
-        if (body is PlayerController player && Destination != null)
+        // 1. Check for Local Destination (Intra-Scene)
+        if (Destination != null)
         {
-            ulong now = Time.GetTicksMsec();
-            if (now - _lastTeleportTime < TELEPORT_COOLDOWN_MS) return;
+            GD.Print($"[PORTAL] Teleporting to Local Destination: {Destination.Name}");
+            // Simple transform teleport
+            body.GlobalPosition = Destination.GlobalPosition;
+            // Optionally match rotation or use relative transform for seamlessness
+            return;
+        }
 
-            GD.Print($"[PORTAL] Teleporting {body.Name} to {Destination.Name}");
-            // Offset logic in 3D
-            Vector3 entryOffset = player.GlobalPosition - this.GlobalPosition;
-            // Simple teleport: just match GlobalPosition + Offset
-            // Note: Rotation matching is more complex (basis transformation), skipping for now.
-            player.GlobalPosition = Destination.GlobalPosition + entryOffset;
-            _lastTeleportTime = now;
+        // 2. Scene Switch
+        if (!string.IsNullOrEmpty(TargetScenePath))
+        {
+            GD.Print($"[PORTAL] Switching Scene to: {TargetScenePath}");
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.LoadLevel(TargetScenePath);
+            }
+            else
+            {
+                GetTree().ChangeSceneToFile(TargetScenePath);
+            }
         }
     }
 }

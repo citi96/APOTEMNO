@@ -1,55 +1,100 @@
-[gd_scene load_steps=3 format=3 uid="uid://dfcpfcf0yhstw"]
+[gd_scene load_steps=9 format=3 uid="uid://dfcpfcf0yhstw"]
 
-[ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://du7btog2knyf0" path="res://_Project/Scripts/Levels/LevelVentricleLogic.cs" id="1_logic"]
+[ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://v6hbdivwq057" path="res://_Project/Scripts/Systems/Interaction/SacrificeAltar.cs" id="3_altar"]
+[ext_resource type="Script" uid="uid://beggosduuqk1v" path="res://_Project/Scripts/Systems/Portal.cs" id="4_portal"]
 
-[sub_resource type="Environment" id="Environment_dark"]
-background_mode = 1
-background_color = Color(0.05, 0.05, 0.05, 1)
-ambient_light_source = 2
-ambient_light_color = Color(0.1, 0.1, 0.1, 1)
+[sub_resource type="StandardMaterial3D" id="Mat_Metal"]
+albedo_color = Color(0.3, 0.3, 0.35, 1)
+metallic = 0.8
+roughness = 0.4
 
-[node name="Level_00_Ventricle" type="Node3D"]
+[sub_resource type="BoxShape3D" id="Shape_Portal"]
+size = Vector3(2, 2, 2)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_dark")
+[sub_resource type="BoxShape3D" id="Shape_ElevatorDoor"]
+size = Vector3(3, 4, 0.2)
+
+[sub_resource type="BoxShape3D" id="Shape_Platform"]
+size = Vector3(3, 0.2, 3)
+
+[node name="Level_00_Ventricle" type="Node3D" node_paths=PackedStringArray("ElevatorDoorVisuals", "ElevatorDoorCollider", "ElevatorPlatform")]
+script = ExtResource("1_logic")
+ElevatorDoorVisuals = NodePath("Industrial_Elevator/Door/Visuals")
+ElevatorDoorCollider = NodePath("Industrial_Elevator/Door/CollisionShape3D")
+ElevatorPlatform = NodePath("Industrial_Elevator/Platform")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 5, 0)
-light_color = Color(0.8, 0.8, 0.9, 1)
-light_energy = 0.5
+light_color = Color(0.7, 0.7, 0.8, 1)
+light_energy = 0.3
 shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 
 [node name="Geometry" type="Node3D" parent="."]
 
 [node name="Floor" type="CSGBox3D" parent="Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 use_collision = true
-size = Vector3(20, 1, 20)
+size = Vector3(30, 1, 30)
+material = SubResource("Mat_Metal")
 
-[node name="Wall1" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -9.5)
+[node name="Pillar_Center" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+radius = 4.0
+height = 10.0
+sides = 16
+material = SubResource("Mat_Metal")
+
+[node name="Altar_Parietal" type="StaticBody3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 5)
+script = ExtResource("3_altar")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Geometry/Altar_Parietal"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Altar_Parietal"]
+shape = SubResource("Shape_Portal")
+
+[node name="Industrial_Elevator" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+
+[node name="Shaft" type="CSGBox3D" parent="Industrial_Elevator"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
 use_collision = true
-size = Vector3(20, 3, 1)
+size = Vector3(4, 6, 4)
+material = SubResource("Mat_Metal")
 
-[node name="Wall2" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 9.5)
-use_collision = true
-size = Vector3(20, 3, 1)
+[node name="Shaft_Hollow" type="CSGBox3D" parent="Industrial_Elevator/Shaft"]
+operation = 2
+size = Vector3(3, 5, 3)
 
-[node name="Wall3" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -9.5, 1.5, 0)
-use_collision = true
-size = Vector3(20, 3, 1)
+[node name="Door" type="StaticBody3D" parent="Industrial_Elevator"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
 
-[node name="Wall4" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 9.5, 1.5, 0)
-use_collision = true
-size = Vector3(20, 3, 1)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Industrial_Elevator/Door"]
+shape = SubResource("Shape_ElevatorDoor")
 
-[node name="Pillar" type="CSGBox3D" parent="Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 3)
-use_collision = true
-size = Vector3(1, 2, 1)
+[node name="Visuals" type="CSGBox3D" parent="Industrial_Elevator/Door"]
+size = Vector3(3, 4, 0.2)
+material = SubResource("Mat_Metal")
 
-[node name="Player" parent="." instance=ExtResource("1_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+[node name="Platform" type="StaticBody3D" parent="Industrial_Elevator"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+
+[node name="Visuals" type="CSGBox3D" parent="Industrial_Elevator/Platform"]
+size = Vector3(3, 0.2, 3)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Industrial_Elevator/Platform"]
+shape = SubResource("Shape_Platform")
+
+[node name="ToArchivePortal" type="Area3D" parent="Industrial_Elevator"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("4_portal")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Industrial_Elevator/ToArchivePortal"]
+shape = SubResource("Shape_Portal")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)

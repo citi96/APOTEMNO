@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SacrificeOption" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://_Project/Scripts/Core/SacrificeOption.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Id = "sacrifice_blood"
+Type = 8
+DisplayName = "Blood"
+Description = "Spill your essence to open the path.
+Effect: Permanently reduce Max Health."

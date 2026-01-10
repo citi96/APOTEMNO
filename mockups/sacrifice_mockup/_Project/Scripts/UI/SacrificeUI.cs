@@ -40,7 +40,7 @@ public partial class SacrificeUI : CanvasLayer
         }
     }
 
-    private void Open()
+    public void Open()
     {
         GD.Print("[UI] Open() Method Called."); 
 
