@@ -21,6 +21,7 @@ InputBroker="*res://_Project/Scripts/Core/InputBroker.cs"
 GameManager="*res://_Project/Scripts/Core/GameManager.cs"
 SacrificeManagerGlobal="*res://_Project/Scripts/Core/SacrificeManagerGlobal.cs"
 NarrativeManagerGlobal="*res://_Project/Scripts/Core/Narrative/NarrativeManagerGlobal.cs"
+SaveSystem="*res://_Project/Scripts/Systems/SaveSystem.cs"
 
 [dotnet]
 

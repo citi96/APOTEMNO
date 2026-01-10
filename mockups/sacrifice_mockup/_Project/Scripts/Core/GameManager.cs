@@ -49,6 +49,21 @@ namespace Apotemno.Core
             GD.Print("[GameManager] Initialized.");
         }
 
+        public override void _Input(InputEvent @event)
+        {
+            if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+            {
+                if (keyEvent.Keycode == Key.F5)
+                {
+                    Apotemno.Systems.SaveSystem.Instance?.SaveGame(1);
+                }
+                else if (keyEvent.Keycode == Key.F9)
+                {
+                    Apotemno.Systems.SaveSystem.Instance?.LoadGame(1);
+                }
+            }
+        }
+
         // --- Flow Control ---
 
         public void StartNewGame()

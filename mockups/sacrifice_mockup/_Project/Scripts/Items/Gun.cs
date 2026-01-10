@@ -20,7 +20,7 @@ public partial class Gun : Node3D
     [Export] public RayCast3D RayCast { get; set; }
     [Export] public Node3D Visuals { get; set; }
 
-    public int CurrentAmmo { get; private set; }
+    public int CurrentAmmo { get; set; }
     public bool IsReloading { get; private set; } = false;
 
     private ulong _lastFireTime;

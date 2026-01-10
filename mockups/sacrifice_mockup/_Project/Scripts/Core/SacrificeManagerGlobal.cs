@@ -12,7 +12,8 @@ public enum SacrificeType
     Legs, // Forces Crawling
     Eyes, // Blinding / Dither intensity
     Voice, // Mutes microphone input (future)
-    Hands // Disables interaction? (future)
+    Hands, // Disables interaction? (future)
+    Memory // Disables Manual Saves, enables Random Autosaves
 }
 
 [GlobalClass]

@@ -7,14 +7,13 @@
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("PlayerCamera", "PlayerCollider", "InteractionRay", "HealthSystem", "HUD")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("PlayerCamera", "PlayerCollider", "InteractionRay", "HealthSystem", "HUD") groups=["Player"]]
 script = ExtResource("1_controller")
 PlayerCamera = NodePath("Head/Camera3D")
 PlayerCollider = NodePath("CollisionShape3D")
 InteractionRay = NodePath("Head/RayCast3D")
 HealthSystem = NodePath("HealthManager")
 HUD = NodePath("HUD")
-EquippedGun = NodePath("Head/Camera3D/Gun")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
