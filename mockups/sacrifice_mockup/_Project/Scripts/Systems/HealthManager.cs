@@ -6,11 +6,9 @@ namespace Apotemno.Systems;
 [GlobalClass]
 public partial class HealthManager : Node
 {
-    [Export]
-    public ProgressBar DisplayedBar; // The lying bar
-
-    [Export]
-    public ProgressBar TrueBar; // The truth (debug)
+    // Signals for UI and Player integration
+    [Signal] public delegate void HealthChangedEventHandler(float real, float fake);
+    [Signal] public delegate void DiedEventHandler();
 
     public float RealHP { get; private set; } = 100.0f;
     public float FakeHP { get; private set; } = 100.0f;
@@ -22,21 +20,21 @@ public partial class HealthManager : Node
 
     // Internal State
     private float _delayTimer = 0.0f;
-    private float _targetFakeHP = 100.0f;
     private bool _isPanicAttack = false;
     private bool _panicDropping = false; // Phase 1 of panic: dropping to 0
     private Random _random = new Random();
 
     public override void _Ready()
     {
-        UpdateBars();
+        EmitHealthUpdate();
     }
 
     public override void _Process(double delta)
     {
         HandleDebugInput();
         UpdateParanoiaLogic((float)delta);
-        UpdateBars();
+        // We emit update every frame during paranoia/updates to animate the bar smoothly
+        EmitHealthUpdate(); 
     }
 
     private void HandleDebugInput()
@@ -64,9 +62,12 @@ public partial class HealthManager : Node
         RealHP = Mathf.Clamp(RealHP - amount, 0, 100);
         GD.Print($"[HEALTH] Real Damage Taken. RealHP: {RealHP}");
 
+        if (RealHP <= 0)
+        {
+            EmitSignal(SignalName.Died);
+        }
+
         // Gaslighting: Don't update target immediately? 
-        // Logic: specific request "When RealHP drops, FakeHP doesn't drop immediately... or goes up slightly"
-        
         // 30% chance to slightly INCREASE FakeHP first (Gaslighting)
         if (_random.NextDouble() < 0.3)
         {
@@ -76,6 +77,13 @@ public partial class HealthManager : Node
 
         // Set the delay before FakeHP starts chasing RealHP
         _delayTimer = GASLIGHT_DELAY;
+    }
+
+    public void Heal(float amount)
+    {
+        RealHP = Mathf.Clamp(RealHP + amount, 0, 100);
+        // Healing might also be delayed or instant? Let's make it instant for relief.
+        FakeHP = RealHP; 
     }
 
     public void TriggerPanicAttack()
@@ -115,16 +123,15 @@ public partial class HealthManager : Node
             if (_delayTimer > 0)
             {
                 _delayTimer -= delta;
-                return; // FREEZE the UI (or let it stay at current gaslit value)
+                return; // FREEZE the UI
             }
 
             // After delay, slowly interpolate towards RealHP
-            // "Scende troppo lentamente"
             if (FakeHP != RealHP)
             {
                 float catchUpSpeed = RECOVERY_SPEED;
                 
-                // If we need to go down, go down slowly. If we need to go up (healing?), go normal.
+                // If we need to go down, go down slowly.
                 if (FakeHP > RealHP) catchUpSpeed = RECOVERY_SPEED * 0.5f; // Slow drop
 
                 FakeHP = Mathf.MoveToward(FakeHP, RealHP, catchUpSpeed * delta);
@@ -132,9 +139,8 @@ public partial class HealthManager : Node
         }
     }
 
-    private void UpdateBars()
+    private void EmitHealthUpdate()
     {
-        if (DisplayedBar != null) DisplayedBar.Value = FakeHP;
-        if (TrueBar != null) TrueBar.Value = RealHP;
+        EmitSignal(SignalName.HealthChanged, RealHP, FakeHP);
     }
 }

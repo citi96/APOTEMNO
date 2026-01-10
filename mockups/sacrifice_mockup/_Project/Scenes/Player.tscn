@@ -1,14 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://cjimm8gl2qcup"]
+[gd_scene load_steps=5 format=3 uid="uid://cjimm8gl2qcup"]
 
 [ext_resource type="Script" uid="uid://x360qhd3hyhb" path="res://_Project/Scripts/Actors/Player/PlayerController.cs" id="1_controller"]
+[ext_resource type="Script" uid="uid://bujvqvhre31b8" path="res://_Project/Scripts/Systems/HealthManager.cs" id="2_health"]
+[ext_resource type="PackedScene" uid="uid://bwm3rm5rkd0wh" path="res://_Project/Scenes/UI/HUD.tscn" id="3_hud"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("PlayerCamera", "PlayerCollider", "InteractionRay")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("PlayerCamera", "PlayerCollider", "InteractionRay", "HealthSystem", "HUD")]
 script = ExtResource("1_controller")
 PlayerCamera = NodePath("Head/Camera3D")
 PlayerCollider = NodePath("CollisionShape3D")
 InteractionRay = NodePath("Head/RayCast3D")
+HealthSystem = NodePath("HealthManager")
+HUD = NodePath("HUD")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -22,3 +26,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 [node name="RayCast3D" type="RayCast3D" parent="Head"]
 target_position = Vector3(0, 0, -2)
 collide_with_areas = true
+
+[node name="HealthManager" type="Node" parent="."]
+script = ExtResource("2_health")
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]

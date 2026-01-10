@@ -1,7 +1,9 @@
 using Godot;
 using Apotemno.Core;
 using Apotemno.Actors.Player.States;
+using Apotemno.Systems;
 using Apotemno.Systems.Interaction;
+using Apotemno.UI;
 
 namespace Apotemno.Actors.Player;
 
@@ -22,6 +24,10 @@ public partial class PlayerController : CharacterBody3D
     [Export] public Node3D PlayerVisuals { get; set; }
     [Export] public CollisionShape3D PlayerCollider { get; set; }
     [Export] public RayCast3D InteractionRay { get; set; }
+
+    [ExportCategory("Systems")]
+    [Export] public HealthManager HealthSystem { get; private set; }
+    [Export] public HUDController HUD { get; set; } // Direct reference for simple wiring
 
     // Stamina
     public float MaxStamina { get; set; } = 100f;
@@ -46,11 +52,22 @@ public partial class PlayerController : CharacterBody3D
 
         StateNormal = new NormalState();
         StateCrawl = new CrawlingState();
-
-        // Default State
+        
         TransitionTo(StateNormal);
         
-        // Setup signals logic if needed (e.g. Sacrifice) - Keeping it minimal for now to ensure 3D works
+        // Connect Health Signals
+        if (HealthSystem != null)
+        {
+            HealthSystem.Died += OnPlayerDied;
+        }
+
+        // Connect HUD
+        if (HUD != null)
+        {
+            HUD.ConnectToPlayer(this);
+        }
+
+        // Setup signals logic if needed (e.g. Sacrifice)
         if (SacrificeManagerGlobal.Instance != null)
         {
              SacrificeManagerGlobal.Instance.SacrificePerformed += OnMutilationOccurred;
@@ -63,6 +80,24 @@ public partial class PlayerController : CharacterBody3D
         {
              SacrificeManagerGlobal.Instance.SacrificePerformed -= OnMutilationOccurred;
         }
+    }
+
+    private void OnPlayerDied()
+    {
+        GD.Print("[PLAYER] DIED! (Logic TBD - Respawn/Game Over)");
+        // Disable movement?
+        // TransitionTo(StateDead);
+    }
+    
+    // Proxy Methods for Health
+    public void TakeDamage(float amount)
+    {
+        HealthSystem?.TakeDamage(amount);
+    }
+    
+    public void Heal(float amount)
+    {
+        HealthSystem?.Heal(amount);
     }
 
     private void OnMutilationOccurred(int typeInt)
@@ -138,8 +173,6 @@ public partial class PlayerController : CharacterBody3D
             if (InteractionRay != null && InteractionRay.IsColliding())
             {
                 var collider = InteractionRay.GetCollider();
-                // 3D Interaction logic would go here. 
-                // Need to ensure Interactables are 3D or specific agnostic interfaces.
                 GD.Print($"[INTERACTION] Ray hit: {((Node)collider).Name}");
             }
         }

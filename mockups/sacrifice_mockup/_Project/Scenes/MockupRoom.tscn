@@ -86,10 +86,8 @@ texture = SubResource("GradientTexture2D_test")
 [node name="InputBroker" type="Node" parent="."]
 script = ExtResource("4_broker")
 
-[node name="HealthManager" type="Node" parent="." node_paths=PackedStringArray("DisplayedBar", "TrueBar")]
+[node name="HealthManager" type="Node" parent="."]
 script = ExtResource("5_health")
-DisplayedBar = NodePath("../CanvasLayer/HealthDisplay/FakeHealthBar")
-TrueBar = NodePath("../CanvasLayer/HealthDisplay/TrueHealthBar")
 
 [node name="SanityManager" type="Node" parent="." node_paths=PackedStringArray("PostProcessRect")]
 script = ExtResource("7_sanity")

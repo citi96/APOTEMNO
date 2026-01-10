@@ -5,9 +5,8 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_portal"]
 size = Vector2(50, 100)
 
-[node name="Portal" type="Node2D" node_paths=PackedStringArray("PortalCamera", "TeleportArea")]
+[node name="Portal" type="Node2D" node_paths=PackedStringArray("TeleportArea")]
 script = ExtResource("1_portal")
-PortalCamera = NodePath("PortalCamera")
 TeleportArea = NodePath("TeleportArea")
 
 [node name="PortalBorder" type="ColorRect" parent="."]

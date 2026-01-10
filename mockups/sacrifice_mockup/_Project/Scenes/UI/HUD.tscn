@@ -1,0 +1,78 @@
+[gd_scene load_steps=2 format=3 uid="uid://bwm3rm5rkd0wh"]
+
+[ext_resource type="Script" uid="uid://hudcs12345" path="res://_Project/Scripts/UI/HUDController.cs" id="1_hud"]
+
+[node name="HUD" type="Control" node_paths=PackedStringArray("RealHealthBar", "FakeHealthBar")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+RealHealthBar = NodePath("DebugContainer/RealHealthBar")
+FakeHealthBar = NodePath("HealthContainer/FakeHealthBar")
+
+[node name="HealthContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+offset_right = 300.0
+grow_vertical = 0
+
+[node name="FakeHealthBar" type="ProgressBar" parent="HealthContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="Label" type="Label" parent="HealthContainer"]
+layout_mode = 0
+offset_left = 21.0
+offset_top = -6.0
+offset_right = 72.0
+offset_bottom = 17.0
+text = "HEALTH"
+
+[node name="DebugContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -100.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="RealHealthBar" type="ProgressBar" parent="DebugContainer"]
+modulate = Color(1, 0, 0, 0.498039)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="DebugContainer"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = -5.0
+offset_right = 113.0
+offset_bottom = 18.0
+text = "REAL (DEBUG)"
