@@ -17,7 +17,7 @@ public partial class PlayerController : CharacterBody2D
     [Export] public RayCast2D InteractionRay { get; set; }
 
     private IPlayerState _currentState;
-    public InputManagerGlobal InputManager { get; private set; }
+    public InputBroker InputManager { get; private set; }
 
     // States
     public NormalState StateNormal { get; private set; }
@@ -26,10 +26,10 @@ public partial class PlayerController : CharacterBody2D
     public override void _Ready()
     {
         // Cache InputManager
-        InputManager = InputManagerGlobal.Instance;
+        InputManager = InputBroker.Instance;
         if (InputManager == null)
         {
-            GD.PushWarning("InputManagerGlobal instance not found! Falling back to direct input if possible, or failing.");
+            GD.PushWarning("InputBroker instance not found! Falling back to direct input if possible, or failing.");
            // Potentially try to find it if it's not setup yet, but it should be Autoload.
         }
 

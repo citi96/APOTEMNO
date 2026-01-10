@@ -204,9 +204,8 @@ public partial class InputBroker : Node
 
     public Vector2 GetMovementVector()
     {
-        // Input API is thread-safe effectively by being main-thread restricted usually. 
-        // If called from another thread, Godot might complain, but our broker logic is consistent.
-        Vector2 input = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+        // Use new Action names
+        Vector2 input = Input.GetVector("move_left", "move_right", "move_forward", "move_backward");
 
         if (Unreliable && _dropInputPacket)
         {
@@ -227,5 +226,25 @@ public partial class InputBroker : Node
         }
 
         return input;
+    }
+
+    /// <summary>
+    /// Triggers gamepad rumble/haptic feedback.
+    /// </summary>
+    /// <param name="weakMagnitude">Low-frequency motor (0.0 to 1.0)</param>
+    /// <param name="strongMagnitude">High-frequency motor (0.0 to 1.0)</param>
+    /// <param name="duration">Duration in seconds (0 for indefinite)</param>
+    /// <param name="device">Joypad device ID (default 0 for player 1)</param>
+    public void TriggerRumble(float weakMagnitude, float strongMagnitude, float duration = 0.5f, int device = 0)
+    {
+        Input.StartJoyVibration(device, weakMagnitude, strongMagnitude, duration);
+    }
+
+    /// <summary>
+    /// Stops all rumble on the specified device.
+    /// </summary>
+    public void StopRumble(int device = 0)
+    {
+        Input.StopJoyVibration(device);
     }
 }
