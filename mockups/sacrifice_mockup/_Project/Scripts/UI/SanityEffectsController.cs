@@ -7,7 +7,7 @@ namespace Apotemno.UI;
 public partial class SanityEffectsController : CanvasLayer
 {
     [Export] public ColorRect GlitchOverlay { get; set; }
-    [Export] public TextureRect BSODImage { get; set; }
+    [Export] public ColorRect BSODImage { get; set; }
     [Export] public Label NotificationLabel { get; set; }
 
     private RandomNumberGenerator _rng = new RandomNumberGenerator();

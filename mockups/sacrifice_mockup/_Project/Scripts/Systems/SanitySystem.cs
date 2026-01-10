@@ -44,15 +44,35 @@ public partial class SanitySystem : Node
         UpdateSanity(delta);
     }
 
+    // Director Control
+    private float _externalStressMultiplier = 1.0f;
+
+    public void SetExternalStress(float multiplier)
+    {
+        _externalStressMultiplier = multiplier;
+    }
+
     private void UpdateSanity(double delta)
     {
         if (GameManager.Instance != null && GameManager.Instance.IsGamePaused) return;
+
+        // Relax Mode Check (Multiplier 0) -> No Decay, maybe Heal?
+        if (_externalStressMultiplier <= 0.01f)
+        {
+             // Optional: Slowly recover Sanity during Relax??
+             // _currentSanity += 1.0f * (float)delta;
+             // _currentSanity = Mathf.Clamp(_currentSanity, 0, Config.MaxSanity);
+             return; 
+        }
 
         float decay = Config.BaseDecayRate;
 
         if (IsInDarkness) decay += Config.DarknessDecayRate;
         if (IsEnemyNear) decay += Config.EnemyNearDecayRate;
         if (IsHearingWhispers) decay += Config.WhispersDecayRate;
+
+        // Apply Director Multiplier
+        decay *= _externalStressMultiplier;
 
         _currentSanity -= decay * (float)delta;
         _currentSanity = Mathf.Clamp(_currentSanity, 0, Config.MaxSanity);
@@ -65,16 +85,22 @@ public partial class SanitySystem : Node
         // Randomly trigger effects based on current sanity level
         // Lower sanity = higher probability
         
+        // If in Relax State (Stress 0), suppress ALL effects
+        if (_externalStressMultiplier <= 0.01f) return;
+
         float sanityPercent = _currentSanity / Config.MaxSanity;
 
         if (sanityPercent < (Config.GlitchThreshold / 100f))
         {
-             // 1% chance per frame to glitch? Too high. 
-             // Use random check scaled by time?
-             // INTENSIFIED: increased chance from 0.005f to 0.05f (10x)
-             if (GD.Randf() < 0.05f) 
+             // Base chance
+             float chance = 0.05f;
+             
+             // If Stress is Peak (> 2.0), drastically increase pulse chance
+             if (_externalStressMultiplier > 2.0f) chance = 0.2f; // 20% per frame is chaotic!
+
+             if (GD.Randf() < chance) 
              {
-                 EmitSignal(SignalName.SanityPulse, 0.2f); // Increased intensity
+                 EmitSignal(SignalName.SanityPulse, 0.2f * _externalStressMultiplier); 
              }
         }
 

@@ -202,10 +202,46 @@ public partial class InputBroker : Node
         }
     }
 
+    // Metrics for Demiurge
+    public int InputDirectionChanges { get; private set; }
+    public float CameraRotationAccumulator { get; private set; }
+    public bool IsSprinting { get; private set; }
+
+    private Vector2 _lastInputVector;
+
+    public void ResetMetrics()
+    {
+        InputDirectionChanges = 0;
+        CameraRotationAccumulator = 0;
+        // IsSprinting is instantaneous, no reset needed usually, but maybe we track "TimeSpentSprinting"
+    }
+
+    public void RegisterCameraInput(float rotationAmount)
+    {
+         CameraRotationAccumulator += Mathf.Abs(rotationAmount);
+    }
+
+    private ulong _lastInputChangeTime;
+
     public Vector2 GetMovementVector()
     {
         // Use new Action names
         Vector2 input = Input.GetVector("move_left", "move_right", "move_forward", "move_backward");
+        
+        IsSprinting = Input.IsActionPressed("sprint"); // Assumes 'sprint' action exists
+
+        // Track Direction Changes (Spamming WASD)
+        // Only count if rapid (less than 300ms since last change)
+        if (input != _lastInputVector)
+        {
+            ulong now = Time.GetTicksMsec();
+            if (now - _lastInputChangeTime < 300) 
+            {
+                InputDirectionChanges++;
+            }
+            _lastInputChangeTime = now;
+            _lastInputVector = input;
+        }
 
         if (Unreliable && _dropInputPacket)
         {
@@ -216,6 +252,7 @@ public partial class InputBroker : Node
         {
             input *= -1;
         }
+
 
         // Check spasms
         Vector2 spasm = _currentSpasm; // Copy

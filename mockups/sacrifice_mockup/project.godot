@@ -23,6 +23,7 @@ SacrificeManagerGlobal="*res://_Project/Scripts/Core/SacrificeManagerGlobal.cs"
 NarrativeManagerGlobal="*res://_Project/Scripts/Core/Narrative/NarrativeManagerGlobal.cs"
 SaveSystem="*res://_Project/Scripts/Systems/SaveSystem.cs"
 SanitySystem="*res://_Project/Scripts/Systems/SanitySystem.cs"
+DemiurgeEngine="*res://_Project/Scripts/Core/DemiurgeEngine.cs"
 
 [dotnet]
 

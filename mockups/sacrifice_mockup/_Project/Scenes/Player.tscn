@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://cjimm8gl2qcup"]
+[gd_scene load_steps=8 format=3 uid="uid://cjimm8gl2qcup"]
 
 [ext_resource type="Script" uid="uid://x360qhd3hyhb" path="res://_Project/Scripts/Actors/Player/PlayerController.cs" id="1_controller"]
 [ext_resource type="Script" uid="uid://bujvqvhre31b8" path="res://_Project/Scripts/Systems/HealthManager.cs" id="2_health"]
 [ext_resource type="PackedScene" uid="uid://bwm3rm5rkd0wh" path="res://_Project/Scenes/UI/HUD.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://gunprefab001" path="res://_Project/Scenes/Items/Gun.tscn" id="4_gun"]
 [ext_resource type="PackedScene" uid="uid://sanityfx001" path="res://_Project/Scenes/UI/SanityEffects.tscn" id="5_sanity"]
+[ext_resource type="Script" uid="uid://bjdggt7cbjopk" path="res://_Project/Scripts/UI/DemiurgeDebugUI.cs" id="6_debugui"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
@@ -36,5 +37,8 @@ collide_with_areas = true
 script = ExtResource("2_health")
 
 [node name="SanityEffects" parent="." instance=ExtResource("5_sanity")]
+
+[node name="DemiurgeDebug" type="CanvasLayer" parent="."]
+script = ExtResource("6_debugui")
 
 [node name="HUD" parent="." instance=ExtResource("3_hud")]

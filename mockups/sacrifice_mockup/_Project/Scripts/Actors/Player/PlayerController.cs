@@ -112,6 +112,9 @@ public partial class PlayerController : CharacterBody3D
     {
         if (@event is InputEventMouseMotion mouseMotion)
         {
+            // Report to Nervous System
+            InputManager?.RegisterCameraInput(mouseMotion.Relative.Length() * 0.01f); // Scale down roughly to radians/intensity
+
             RotateY(-mouseMotion.Relative.X * MouseSensitivity);
             
             if (PlayerCamera != null)
