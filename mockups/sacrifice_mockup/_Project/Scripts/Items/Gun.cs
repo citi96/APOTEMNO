@@ -26,9 +26,14 @@ public partial class Gun : Node3D
     private ulong _lastFireTime;
     private float _fireIntervalMsec;
 
+    [ExportCategory("Accuracy")]
+    [Export] public float BaseSpread { get; set; } = 0.0f;
+    public float CurrentSpread { get; set; }
+
     public override void _Ready()
     {
         CurrentAmmo = MaxAmmo;
+        CurrentSpread = BaseSpread;
         _fireIntervalMsec = FireRate * 1000f;
         
         // Defer signal to ensure UI is ready
@@ -58,7 +63,20 @@ public partial class Gun : Node3D
         // Hitscan
         if (RayCast != null)
         {
+            // Apply Spread - Rotate the RayCast TEMPORARILY
+            // Or better: Use GlobalTransform forward + random deviation
+            // Since we rely on RayCast3D node, we must rotate it or cast manually.
+            // Rotating node is easiest but must reset.
+            
+            float spreadAngle = Mathf.DegToRad(CurrentSpread);
+            float randX = (GD.Randf() * 2 - 1) * spreadAngle; // -spread to +spread
+            float randY = (GD.Randf() * 2 - 1) * spreadAngle;
+            
+            Vector3 originalRot = RayCast.Rotation;
+            RayCast.Rotation = new Vector3(originalRot.X + randX, originalRot.Y + randY, originalRot.Z);
+
             RayCast.ForceRaycastUpdate(); // Ensure ray is fresh
+            
             if (RayCast.IsColliding())
             {
                 var collider = RayCast.GetCollider();
@@ -70,6 +88,9 @@ public partial class Gun : Node3D
                     enemy.TakeDamage(Damage);
                 }
             }
+            
+            // Reset Rotation
+            RayCast.Rotation = originalRot;
         }
     }
 

@@ -102,10 +102,46 @@ public partial class PlayerController : CharacterBody3D
     public void TakeDamage(float amount) => HealthSystem?.TakeDamage(amount);
     public void Heal(float amount) => HealthSystem?.Heal(amount);
 
+    public bool HasRightEye { get; private set; } = true;
+
+    // Public method for Manager to call
+    public void ApplyEyeSacrifice()
+    {
+        if (!HasRightEye) return; // Already lost
+
+        HasRightEye = false;
+        GD.Print("[VESSEL] Right Eye Sacrificed. Adjusting Perception...");
+
+        // 1. Reduce Accuracy
+        if (EquippedGun != null)
+        {
+            // "riduci l’accuratezza... raddoppia la deviazione random"
+            // Let's set a base spread. If base is 0, we set to something 5.0f deg.
+            float penalty = 15.0f; // Significant spread
+            EquippedGun.CurrentSpread += penalty;
+            GD.Print($"[VESSEL] Gun Spread increased to {EquippedGun.CurrentSpread}");
+        }
+
+        // 2. Visual Overlay
+        if (HUD != null)
+        {
+            HUD.EnableRightEyeBlindness();
+        }
+        else
+        {
+            GD.PrintErr("[VESSEL] Cannot apply Blindness Overlay: HUD is null!");
+        }
+
+        // 3. TODO: Disable Enemy Indicators on Right Side (NarrativeManager / PerceptionSystem)
+    }
+
     private void OnMutilationOccurred(int typeInt)
     {
          var type = (SacrificeType)typeInt;
          if (type == SacrificeType.Legs) TransitionTo(StateCrawl);
+         // Note: We could handle RightEye here too, or let Manager call ApplyEyeSacrifice directly.
+         // Manager explicitly calls effects, so sticking to public method is fine or event is fine.
+         // If Manager calls ApplyEyeSacrifice via ApplySacrificeEffects, we don't need it here.
     }
 
     public override void _Input(InputEvent @event)

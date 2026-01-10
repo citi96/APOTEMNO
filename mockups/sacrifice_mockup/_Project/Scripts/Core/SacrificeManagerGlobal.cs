@@ -141,6 +141,19 @@ public partial class SacrificeManagerGlobal : Node
         // Centralized effect application
         switch(type)
         {
+            case SacrificeType.RightEye:
+                // Find Player and Apply Effect
+                var player = GetTree().GetFirstNodeInGroup("Player") as Actors.Player.PlayerController;
+                if (player != null)
+                {
+                    player.ApplyEyeSacrifice();
+                }
+                else
+                {
+                    GD.PrintErr("[LITURGY] Could not find Player to apply Right Eye Sacrifice!");
+                    // Fallback: If player not found by Group, try path if relevant or just log
+                }
+                break;
             case SacrificeType.Legs:
                 // Notification handled by PlayerController listening to signal usually, 
                 // but we can also force it here if we have reference.
