@@ -4,84 +4,43 @@ namespace Apotemno.Actors.Player.States;
 
 public class CrawlingState : IPlayerState
 {
-    public void Enter(PlayerController player)
+    public void Enter(PlayerController player) 
     {
-        // Apply penalties
-        GD.Print("[VESSEL] Legs gone. Crawling initiated.");
-        
-        // Visual/Collider Logic - reducing height
-        // Since we don't have the specific setup, we'll try to scale the collider or just log it.
-        // If PlayerCollider is assigned:
-        if (player.PlayerCollider != null)
-        {
-             // Temporary hack: Scale Y down? Or switch shape?
-             // Safest for generic:
-             player.PlayerCollider.Scale = new Vector2(1, 0.4f);
-        }
-        
-        if (player.PlayerVisuals != null)
-        {
-             player.PlayerVisuals.Scale = new Vector2(1, 0.4f);
-        }
-        
-        // Camera logic - User feedback: "Zoom random". Disabling for now.
-        // if (player.PlayerCamera != null)
-        // {
-        //    player.PlayerCamera.Zoom = new Vector2(1.2f, 1.2f);
-        // }
+        // Reduce height
+        if (player.PlayerVisuals != null) player.PlayerVisuals.Scale = new Vector3(1, 0.4f, 1);
+        if (player.PlayerCollider != null) player.PlayerCollider.Scale = new Vector3(1, 0.4f, 1);
     }
 
-    public void Update(PlayerController player, double delta)
-    {
-        // Crawling is forced, maybe can't go back unless healed?
-        // Logic for "Restoring" legs not requested yet.
-        
-        // Debug: Press N to return (if allowed)
-        if (Input.IsKeyPressed(Key.N))
-        {
-            player.TransitionTo(player.StateNormal);
-        }
-    }
+    public void Update(PlayerController player, double delta) { }
 
     public void PhysicsUpdate(PlayerController player, double delta)
     {
-        if (player.InputManager == null) return;
+         if (player.InputManager == null) return;
 
         Vector2 inputDir = player.InputManager.GetMovementVector();
+        Vector3 direction = (player.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+
+        float speed = player.WalkSpeed * player.CrawlSpeedPenalty;
         
-        // Reduced Speed
-        float speed = player.MovementSpeed * player.CrawlSpeedPenalty;
-        
-        Vector2 velocity = player.Velocity;
-        
-        if (inputDir != Vector2.Zero)
+        Vector3 velocity = player.Velocity;
+        if (direction != Vector3.Zero)
         {
-            velocity = inputDir * speed;
+            velocity.X = direction.X * speed;
+            velocity.Z = direction.Z * speed;
         }
         else
         {
-            velocity = velocity.MoveToward(Vector2.Zero, speed);
+            velocity.X = Mathf.MoveToward(player.Velocity.X, 0, speed);
+            velocity.Z = Mathf.MoveToward(player.Velocity.Z, 0, speed);
         }
 
         player.Velocity = velocity;
     }
 
-    public void Exit(PlayerController player)
+    public void Exit(PlayerController player) 
     {
-        // Restore
-        if (player.PlayerCollider != null)
-        {
-             player.PlayerCollider.Scale = new Vector2(1, 1);
-        }
-        
-        if (player.PlayerVisuals != null)
-        {
-             player.PlayerVisuals.Scale = new Vector2(1, 1);
-        }
-
-        // if (player.PlayerCamera != null)
-        // {
-        //     player.PlayerCamera.Zoom = new Vector2(1, 1);
-        // }
+         // Restore height
+        if (player.PlayerVisuals != null) player.PlayerVisuals.Scale = Vector3.One;
+        if (player.PlayerCollider != null) player.PlayerCollider.Scale = Vector3.One;
     }
 }

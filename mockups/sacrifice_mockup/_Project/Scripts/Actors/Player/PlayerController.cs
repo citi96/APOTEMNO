@@ -6,16 +6,32 @@ using Apotemno.Systems.Interaction;
 namespace Apotemno.Actors.Player;
 
 [GlobalClass]
-public partial class PlayerController : CharacterBody2D
+public partial class PlayerController : CharacterBody3D
 {
-    [Export] public float MovementSpeed { get; set; } = 300.0f;
-    [Export] public float CrawlSpeedPenalty { get; set; } = 0.4f; // 40% of speed (60% reduction)
+    [ExportCategory("Movement")]
+    [Export] public float WalkSpeed { get; set; } = 5.0f;
+    [Export] public float SprintSpeed { get; set; } = 8.0f;
+    [Export] public float CrawlSpeedPenalty { get; set; } = 0.4f;
+    [Export] public float JumpVelocity { get; set; } = 4.5f;
 
-    [Export] public Camera2D PlayerCamera { get; set; }
-    [Export] public Node2D PlayerVisuals { get; set; } // For scaling sprite
-    [Export] public CollisionShape2D PlayerCollider { get; set; }
-    [Export] public RayCast2D InteractionRay { get; set; }
+    [ExportCategory("Camera")]
+    [Export] public Camera3D PlayerCamera { get; set; }
+    [Export] public float MouseSensitivity { get; set; } = 0.003f;
 
+    [ExportCategory("Visuals")]
+    [Export] public Node3D PlayerVisuals { get; set; }
+    [Export] public CollisionShape3D PlayerCollider { get; set; }
+    [Export] public RayCast3D InteractionRay { get; set; }
+
+    // Stamina
+    public float MaxStamina { get; set; } = 100f;
+    public float CurrentStamina { get; set; } = 100f;
+    public float StaminaDrainRate { get; set; } = 20f;
+    public float StaminaRegenRate { get; set; } = 10f;
+    public bool IsSprinting { get; private set; }
+
+    // Internal
+    private float _gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
     private IPlayerState _currentState;
     public InputBroker InputManager { get; private set; }
 
@@ -25,107 +41,86 @@ public partial class PlayerController : CharacterBody2D
 
     public override void _Ready()
     {
-        // Cache InputManager
         InputManager = InputBroker.Instance;
-        if (InputManager == null)
-        {
-            GD.PushWarning("InputBroker instance not found! Falling back to direct input if possible, or failing.");
-           // Potentially try to find it if it's not setup yet, but it should be Autoload.
-        }
+        Input.MouseMode = Input.MouseModeEnum.Captured;
 
-        // Initialize States
         StateNormal = new NormalState();
         StateCrawl = new CrawlingState();
+
+        // Default State
+        TransitionTo(StateNormal);
         
-        // PERSISTENCE CHECK: Do we have legs?
+        // Setup signals logic if needed (e.g. Sacrifice) - Keeping it minimal for now to ensure 3D works
         if (SacrificeManagerGlobal.Instance != null)
         {
-            if (SacrificeManagerGlobal.Instance.HasSacrificed(SacrificeType.Legs))
-            {
-                TransitionTo(StateCrawl);
-            }
-            else
-            {
-                TransitionTo(StateNormal);
-            }
-            
-            // Listen for future sins
-            SacrificeManagerGlobal.Instance.SacrificePerformed += OnMutilationOccurred;
-        }
-        else
-        {
-             // Default State
-            TransitionTo(StateNormal);
-        }
-    }
-
-    private void OnMutilationOccurred(int typeInt)
-    {
-        var type = (SacrificeType)typeInt;
-        if (type == SacrificeType.Legs)
-        {
-            GD.Print("[VESSEL] Legs sacrificed. Collapsing.");
-            TransitionTo(StateCrawl);
+             SacrificeManagerGlobal.Instance.SacrificePerformed += OnMutilationOccurred;
         }
     }
 
     public override void _ExitTree()
     {
-         if (SacrificeManagerGlobal.Instance != null)
-         {
+        if (SacrificeManagerGlobal.Instance != null)
+        {
              SacrificeManagerGlobal.Instance.SacrificePerformed -= OnMutilationOccurred;
-         }
-    }
-
-    public override void _Process(double delta)
-    {
-        _currentState?.Update(this, delta);
-        HandleInteraction();
-    }
-
-    private void HandleInteraction()
-    {
-        // Debug Reload for Persistence Testing
-        if (Input.IsKeyPressed(Key.R))
-        {
-            GD.Print("[DEBUG] Reloading Scene to test Persistence...");
-            GetTree().ReloadCurrentScene();
         }
+    }
 
-        if (Input.IsActionJustPressed("ui_accept"))
+    private void OnMutilationOccurred(int typeInt)
+    {
+         var type = (SacrificeType)typeInt;
+         if (type == SacrificeType.Legs) TransitionTo(StateCrawl);
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        if (@event is InputEventMouseMotion mouseMotion)
         {
-            if (InteractionRay != null)
+            // Yaw (Body)
+            RotateY(-mouseMotion.Relative.X * MouseSensitivity);
+            
+            // Pitch (Camera)
+            if (PlayerCamera != null)
             {
-                if (InteractionRay.IsColliding())
-                {
-                    var collider = InteractionRay.GetCollider();
-                    GD.Print($"[INTERACTION] Ray hit: {((Node)collider).Name}");
-                    
-                    if (collider is IInteractable interactable && interactable.IsInteractable)
-                    {
-                        interactable.Interact(this);
-                    }
-                    else
-                    {
-                         GD.Print("[INTERACTION] Hit object is not IInteractable or not ready.");
-                    }
-                }
-                else
-                {
-                    GD.Print("[INTERACTION] RayCast did not hit anything.");
-                }
-            }
-            else
-            {
-                GD.PrintErr("[INTERACTION] InteractionRay is null!");
+                PlayerCamera.RotateX(-mouseMotion.Relative.Y * MouseSensitivity);
+                Vector3 rot = PlayerCamera.Rotation;
+                rot.X = Mathf.Clamp(rot.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
+                PlayerCamera.Rotation = rot;
             }
         }
     }
 
     public override void _PhysicsProcess(double delta)
     {
+        // Apply Gravity
+        Vector3 velocity = Velocity;
+        if (!IsOnFloor())
+        {
+            velocity.Y -= _gravity * (float)delta;
+        }
+
+        Velocity = velocity; // Update for State
+
         _currentState?.PhysicsUpdate(this, delta);
+        
+        // Stamina Logic
+        HandleStamina(delta);
+
         MoveAndSlide();
+
+        HandleInteraction();
+    }
+
+    private void HandleStamina(double delta)
+    {
+        if (IsSprinting && Velocity.Length() > 0.1f)
+        {
+            CurrentStamina = Mathf.Max(0, CurrentStamina - StaminaDrainRate * (float)delta);
+            if (CurrentStamina <= 0) IsSprinting = false;
+        }
+        else
+        {
+            CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + StaminaRegenRate * (float)delta);
+        }
     }
 
     public void TransitionTo(IPlayerState newState)
@@ -133,7 +128,20 @@ public partial class PlayerController : CharacterBody2D
         _currentState?.Exit(this);
         _currentState = newState;
         _currentState?.Enter(this);
-        
         GD.Print($"[VESSEL] Transitioned to {_currentState.GetType().Name}");
+    }
+
+    private void HandleInteraction()
+    {
+        if (Input.IsActionJustPressed("interact"))
+        {
+            if (InteractionRay != null && InteractionRay.IsColliding())
+            {
+                var collider = InteractionRay.GetCollider();
+                // 3D Interaction logic would go here. 
+                // Need to ensure Interactables are 3D or specific agnostic interfaces.
+                GD.Print($"[INTERACTION] Ray hit: {((Node)collider).Name}");
+            }
+        }
     }
 }

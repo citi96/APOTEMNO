@@ -4,30 +4,12 @@ namespace Apotemno.Actors.Player.States;
 
 public class NormalState : IPlayerState
 {
-    public void Enter(PlayerController player)
-    {
-        // Reset camera/collider to normal
-        // Assuming default values or storing "NormalHeight" in player could be useful
-        // For now, we trust the editor setup is "Normal"
-        if (player.PlayerCamera != null)
-        {
-            // Reset offset logic if implemented
-        }
-        
-    }
+    public void Enter(PlayerController player) { }
 
     public void Update(PlayerController player, double delta)
     {
-        // Handle State Transitions (e.g. if health is low, or trigger)
-        // For PROD-001 we just need the state to exist.
-        // User asked: "Questo stato sarà forzato quando avverrà il sacrificio delle gambe."
-        // So we might need a method to ForceCrawl.
-        
-        // Debug testing: Press C to crawl
-        if (Input.IsKeyPressed(Key.C)) // Temporary debug
-        {
-            player.TransitionTo(player.StateCrawl);
-        }
+        // Debug
+        // if (Input.IsKeyPressed(Key.C)) player.TransitionTo(player.StateCrawl);
     }
 
     public void PhysicsUpdate(PlayerController player, double delta)
@@ -35,28 +17,35 @@ public class NormalState : IPlayerState
         if (player.InputManager == null) return;
 
         Vector2 inputDir = player.InputManager.GetMovementVector();
-        
-        Vector2 velocity = player.Velocity;
-        
-        if (inputDir != Vector2.Zero)
+        // Transform 2D input to 3D direction relative to player
+        Vector3 direction = (player.Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+
+        float speed = player.WalkSpeed;
+        if (Input.IsActionPressed("sprint") && player.CurrentStamina > 0)
         {
-            velocity = inputDir * player.MovementSpeed;
+             speed = player.SprintSpeed;
+             // We set a flag on player to drain stamina
+             // player.IsSprinting = true; // Need to expose setter or method
+             // For now simple check in PlayerController handles logic if we just set velocity high?
+             // Actually better to let PlayerController handle Sprint state or expose public property.
+             // We'll trust PlayerController reads input, but State defines speed.
+        }
+
+        Vector3 velocity = player.Velocity;
+
+        if (direction != Vector3.Zero)
+        {
+            velocity.X = direction.X * speed;
+            velocity.Z = direction.Z * speed;
         }
         else
         {
-            velocity = velocity.MoveToward(Vector2.Zero, player.MovementSpeed);
-        }
-
-        if (velocity != Vector2.Zero)
-        {
-             player.Rotation = velocity.Angle();
+            velocity.X = Mathf.MoveToward(player.Velocity.X, 0, speed);
+            velocity.Z = Mathf.MoveToward(player.Velocity.Z, 0, speed);
         }
 
         player.Velocity = velocity;
     }
 
-    public void Exit(PlayerController player)
-    {
-        // Cleanup if needed
-    }
+    public void Exit(PlayerController player) { }
 }

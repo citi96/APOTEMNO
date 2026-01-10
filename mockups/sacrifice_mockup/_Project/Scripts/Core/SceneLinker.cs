@@ -10,12 +10,10 @@ public partial class SceneLinker : Node
 {
     [Export] public Portal PortalA;
     [Export] public Portal PortalB;
-    [Export] public Camera2D PlayerCamera;
+    [Export] public Camera3D PlayerCamera; // Changed to Camera3D
 
     public override void _Ready()
     {
-        // Allow a frame for things to settle if needed, but usually _Ready is fine.
-        // We defer call just to be safe vs Order of Operations.
         CallDeferred(nameof(ConnectPortals));
     }
 
@@ -24,22 +22,27 @@ public partial class SceneLinker : Node
         if (PortalA != null && PortalB != null)
         {
             // Link A -> B
-            PortalA.Destination = PortalB;
-            PortalA.PlayerCamera = PlayerCamera;
+            // PortalA.Destination = PortalB; // Portal.Destination is Node3D. Portal is Node3D. This works.
             
             // Link B -> A
-            PortalB.Destination = PortalA;
-            PortalB.PlayerCamera = PlayerCamera;
+            // PortalB.Destination = PortalA;
+
+            // In 3D Portal.cs, we explicitly set Destination in Inspector usually. 
+            // If runtime linking is needed:
+            if (PortalA.Destination == null) PortalA.Destination = PortalB;
+            if (PortalB.Destination == null) PortalB.Destination = PortalA;
+
+            // PlayerCamera assignment removed as it was for 2D visual sync.
+            // PortalA.PlayerCamera = PlayerCamera; 
 
             // FORCE PLAYER CAMERA DOMINANCE
             if (PlayerCamera != null)
             {
-                PlayerCamera.Enabled = true;
-                PlayerCamera.MakeCurrent();
+                PlayerCamera.Current = true; // Use .Current in 3D
                 GD.Print("[SCENE LINKER] Player Camera set to CURRENT.");
             }
 
-            GD.Print("[SCENE LINKER] Portals Connected Successfully (C#).");
+            GD.Print("[SCENE LINKER] Portals Connected Successfully (C# 3D).");
         }
         else
         {

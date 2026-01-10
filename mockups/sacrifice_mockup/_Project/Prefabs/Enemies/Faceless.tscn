@@ -2,36 +2,36 @@
 
 [ext_resource type="Script" uid="uid://dfax7cd4dsw27" path="res://_Project/Scripts/Actors/Enemies/FacelessAI.cs" id="1_ai"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_pmvx2"]
-radius = 16.0
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
 
-[node name="Faceless" type="CharacterBody2D" node_paths=PackedStringArray("NavAgent", "VisNotifier", "Visuals") groups=["Enemy"]]
+[node name="Faceless" type="CharacterBody3D" node_paths=PackedStringArray("NavAgent", "VisNotifier", "StaticSound", "Visuals") groups=["Enemy"]]
 collision_layer = 4
 collision_mask = 3
 script = ExtResource("1_ai")
-NavAgent = NodePath("NavigationAgent2D")
-VisNotifier = NodePath("VisibleOnScreenNotifier2D")
+NavAgent = NodePath("NavigationAgent3D")
+VisNotifier = NodePath("VisibleOnScreenNotifier3D")
+StaticSound = NodePath("AudioStreamPlayer3D")
 Visuals = NodePath("Visuals")
 
-[node name="Visuals" type="Node2D" parent="."]
+[node name="Visuals" type="Node3D" parent="."]
 
-[node name="Polygon2D" type="Polygon2D" parent="Visuals"]
-color = Color(0, 0, 0, 1)
-polygon = PackedVector2Array(-16, 0, 16, 0, 12, -140, -12, -150)
+[node name="Body" type="CSGCylinder3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+radius = 0.4
+sides = 12
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -6)
-shape = SubResource("CircleShape2D_pmvx2")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_enemy")
 
-[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 3.0
-target_desired_distance = 3.0
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 2.0
+target_desired_distance = 2.0
 debug_enabled = true
 
-[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-position = Vector2(0, -75)
-scale = Vector2(1.6, 7.5)
+[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="."]
+aabb = AABB(-0.5, 0, -0.5, 1, 2, 1)
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
-max_distance = 500.0
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
+max_distance = 20.0
 bus = &"Intruder"
