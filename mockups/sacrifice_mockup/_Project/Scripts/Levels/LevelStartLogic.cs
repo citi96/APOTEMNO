@@ -26,6 +26,7 @@ public partial class LevelStartLogic : Node3D
         if (PitGlow != null) _pitGlowStartEnergy = PitGlow.LightEnergy;
 
         RegisterSacrificeListener();
+        EnsureGameplayState();
 
         CallDeferred(nameof(PlayIntroSequence));
     }
@@ -90,10 +91,12 @@ public partial class LevelStartLogic : Node3D
 
     private void DisablePitCoverCollision()
     {
-        if (PitCover is CsgShape3D coverShape)
+        if (PitCover == null)
         {
-            coverShape.UseCollision = false;
+            return;
         }
+
+        PitCover.Set("use_collision", false);
     }
 
     private void RegisterSacrificeListener()
@@ -138,5 +141,11 @@ public partial class LevelStartLogic : Node3D
         tween.TweenProperty(PitGlow, "light_energy", _pitGlowStartEnergy + 15.0f, OpenDuration)
             .SetTrans(Tween.TransitionType.Sine)
             .SetEase(Tween.EaseType.Out);
+    }
+
+    private void EnsureGameplayState()
+    {
+        GetTree().Paused = false;
+        Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 }
