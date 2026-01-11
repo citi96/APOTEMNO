@@ -1,9 +1,13 @@
-[gd_scene load_steps=10 format=3 uid="uid://dkthw3jc4aeah"]
+[gd_scene load_steps=17 format=3 uid="uid://dkthw3jc4aeah"]
 
 [ext_resource type="Script" uid="uid://brlymhmkp25gc" path="res://_Project/Scripts/Levels/LevelStartLogic.cs" id="1_logic"]
 [ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://dsxpy8nbal7tn" path="res://_Project/Scenes/Interactables/SacrificeAltar.tscn" id="3_altar_prefab"]
 [ext_resource type="Script" uid="uid://beggosduuqk1v" path="res://_Project/Scripts/Systems/Portal.cs" id="4_portal"]
+[ext_resource type="PackedScene" uid="uid://narrativeoverlay123" path="res://_Project/Scenes/UI/NarrativeOverlay.tscn" id="5_narrative"]
+[ext_resource type="PackedScene" uid="uid://0f1ecrea1w63" path="res://_Project/Scenes/ShepardToneGenerator.tscn" id="6_shepard"]
+[ext_resource type="Script" uid="uid://h7ihxq3k2l1n6" path="res://_Project/Scripts/Systems/Narrative/NarrativeTrigger3D.cs" id="7_trigger"]
+[ext_resource type="Script" uid="uid://cq716vxke0v7s" path="res://_Project/Scripts/Systems/Infrasound.cs" id="8_infrasound"]
 [ext_resource type="Material" path="res://_Project/Materials/Concrete.tres" id="ConcreteMat"]
 
 [sub_resource type="Environment" id="Env_Vestibule"]
@@ -26,11 +30,30 @@ size = Vector3(4, 5, 1)
 [sub_resource type="StandardMaterial3D" id="Mat_Floor"]
 albedo_color = Color(0.1, 0.1, 0.1, 1)
 
-[node name="Level_Start" type="Node3D" node_paths=PackedStringArray("DoorVisuals", "DoorCollider", "PitCover")]
+[sub_resource type="StandardMaterial3D" id="Mat_Blood"]
+albedo_color = Color(0.2, 0.02, 0.02, 1)
+emission_enabled = true
+emission = Color(0.6, 0.05, 0.05, 1)
+emission_energy_multiplier = 2.0
+roughness = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_Accent"]
+albedo_color = Color(0.2, 0.2, 0.25, 1)
+metallic = 0.1
+roughness = 0.8
+
+[sub_resource type="BoxShape3D" id="Shape_TriggerWide"]
+size = Vector3(8, 4, 8)
+
+[sub_resource type="BoxShape3D" id="Shape_TriggerNarrow"]
+size = Vector3(6, 4, 6)
+
+[node name="Level_Start" type="Node3D" node_paths=PackedStringArray("DoorVisuals", "DoorCollider", "PitCover", "PitGlow")]
 script = ExtResource("1_logic")
 DoorVisuals = NodePath("Environment/Door/Visuals")
 DoorCollider = NodePath("Environment/Door/CollisionShape3D")
 PitCover = NodePath("Environment/Pit/Cover")
+PitGlow = NodePath("Environment/Lights/PitGlow")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 10, 0)
@@ -85,6 +108,27 @@ material = ExtResource("ConcreteMat")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -5)
 size = Vector3(4, 0.5, 4)
 material = ExtResource("ConcreteMat")
+
+[node name="AltarRing" type="CSGTorus3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -5)
+ring_radius = 2.2
+pipe_radius = 0.15
+material = SubResource("Mat_Blood")
+
+[node name="BloodChannel_Left" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.12, -10)
+size = Vector3(0.4, 0.1, 10)
+material = SubResource("Mat_Blood")
+
+[node name="BloodChannel_Right" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.12, -10)
+size = Vector3(0.4, 0.1, 10)
+material = SubResource("Mat_Blood")
+
+[node name="EntryPlinth" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 12.5)
+size = Vector3(6, 0.3, 4)
+material = SubResource("Mat_Accent")
 
 [node name="CorridorEntry" type="CSGBox3D" parent="Environment/Geometry"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 10)
@@ -169,9 +213,62 @@ light_energy = 5.0
 shadow_enabled = true
 omni_range = 15.0
 
+[node name="PitGlow" type="OmniLight3D" parent="Environment/Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, -18)
+light_color = Color(0.8, 0.1, 0.1, 1)
+light_energy = 0.0
+shadow_enabled = true
+omni_range = 12.0
+
 [node name="SacrificeAltar" parent="Environment" instance=ExtResource("3_altar_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
 RequiredSacrifice = 8
+
+[node name="Triggers" type="Node3D" parent="."]
+
+[node name="TriggerEntry" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 12)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_trigger")
+LineText = "[center]Sei entrato con tutto. Non ne uscirai intero.[/center]"
+Duration = 3.5
+OneShot = true
+InterruptPrevious = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/TriggerEntry"]
+shape = SubResource("Shape_TriggerWide")
+
+[node name="TriggerAltar" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -4.5)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_trigger")
+LineText = "[center]L'altare ascolta. Premi E per offrire sangue.[/center]"
+Duration = 3.2
+OneShot = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/TriggerAltar"]
+shape = SubResource("Shape_TriggerNarrow")
+
+[node name="TriggerDoor" type="Area3D" parent="Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -12.5)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_trigger")
+LineText = "[center]Il vestibolo si svuota. Ora puoi cadere.[/center]"
+Duration = 3.0
+OneShot = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Triggers/TriggerDoor"]
+shape = SubResource("Shape_TriggerNarrow")
+
+[node name="NarrativeOverlay" parent="." instance=ExtResource("5_narrative")]
+
+[node name="ShepardToneGenerator" parent="." instance=ExtResource("6_shepard")]
+
+[node name="Infrasound" type="Node" parent="."]
+script = ExtResource("8_infrasound")
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, 1, 14)
