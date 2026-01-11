@@ -1,18 +1,30 @@
-[gd_scene load_steps=8 format=3 uid="uid://dkthw3jc4aeah"]
+[gd_scene load_steps=10 format=3 uid="uid://dkthw3jc4aeah"]
 
 [ext_resource type="Script" uid="uid://brlymhmkp25gc" path="res://_Project/Scripts/Levels/LevelStartLogic.cs" id="1_logic"]
 [ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://dsxpy8nbal7tn" path="res://_Project/Scenes/Interactables/SacrificeAltar.tscn" id="3_altar_prefab"]
 [ext_resource type="Script" uid="uid://beggosduuqk1v" path="res://_Project/Scripts/Systems/Portal.cs" id="4_portal"]
+[ext_resource type="Material" path="res://_Project/Materials/Concrete.tres" id="ConcreteMat"]
 
-[sub_resource type="StandardMaterial3D" id="Mat_Floor"]
-albedo_color = Color(0.1, 0.1, 0.1, 1)
+[sub_resource type="Environment" id="Env_Vestibule"]
+background_mode = 1
+background_color = Color(0.02, 0.02, 0.02, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.1, 0.1, 0.15, 1)
+tonemap_mode = 2
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.015
+volumetric_fog_albedo = Color(0.2, 0.2, 0.25, 1)
+volumetric_fog_emission = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="BoxShape3D" id="Shape_Pit"]
+size = Vector3(10, 1, 10)
 
 [sub_resource type="BoxShape3D" id="Shape_Door"]
 size = Vector3(4, 5, 1)
 
-[sub_resource type="BoxShape3D" id="Shape_Pit"]
-size = Vector3(10, 1, 10)
+[sub_resource type="StandardMaterial3D" id="Mat_Floor"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
 
 [node name="Level_Start" type="Node3D" node_paths=PackedStringArray("DoorVisuals", "DoorCollider", "PitCover")]
 script = ExtResource("1_logic")
@@ -22,48 +34,144 @@ PitCover = NodePath("Environment/Pit/Cover")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 10, 0)
+visible = false
 light_energy = 0.5
 shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_Vestibule")
 
 [node name="Environment" type="Node3D" parent="."]
 
-[node name="Floor" type="CSGBox3D" parent="Environment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+[node name="Geometry" type="CSGCombiner3D" parent="Environment"]
 use_collision = true
-size = Vector3(20, 1, 30)
-material = SubResource("Mat_Floor")
 
-[node name="Door" type="StaticBody3D" parent="Environment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -10)
+[node name="MainChamber" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -5)
+size = Vector3(15, 10, 20)
+material = ExtResource("ConcreteMat")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Door"]
-shape = SubResource("Shape_Door")
+[node name="ChamberHollow" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
+operation = 2
+size = Vector3(13, 8, 18)
+material = ExtResource("ConcreteMat")
 
-[node name="Visuals" type="CSGBox3D" parent="Environment/Door"]
-size = Vector3(4, 5, 1)
-material = SubResource("Mat_Floor")
+[node name="Pillar_L1" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -4)
+size = Vector3(2, 8, 2)
+material = ExtResource("ConcreteMat")
+
+[node name="Pillar_R1" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, -4)
+size = Vector3(2, 8, 2)
+material = ExtResource("ConcreteMat")
+
+[node name="Pillar_L2" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 4)
+size = Vector3(2, 8, 2)
+material = ExtResource("ConcreteMat")
+
+[node name="Pillar_R2" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 4)
+size = Vector3(2, 8, 2)
+material = ExtResource("ConcreteMat")
+
+[node name="AltarDais_1" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -5)
+size = Vector3(6, 0.5, 6)
+material = ExtResource("ConcreteMat")
+
+[node name="AltarDais_2" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -5)
+size = Vector3(4, 0.5, 4)
+material = ExtResource("ConcreteMat")
+
+[node name="CorridorEntry" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 10)
+size = Vector3(4, 5, 10)
+material = ExtResource("ConcreteMat")
+
+[node name="CorridorHollow" type="CSGBox3D" parent="Environment/Geometry/CorridorEntry"]
+operation = 2
+size = Vector3(2.5, 3.5, 11)
+material = ExtResource("ConcreteMat")
+
+[node name="Arch_1" type="CSGBox3D" parent="Environment/Geometry/CorridorEntry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 2)
+size = Vector3(2.5, 1, 0.5)
+material = ExtResource("ConcreteMat")
+
+[node name="Arch_2" type="CSGBox3D" parent="Environment/Geometry/CorridorEntry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -2)
+size = Vector3(2.5, 1, 0.5)
+material = ExtResource("ConcreteMat")
+
+[node name="DoorFrame" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -14)
+size = Vector3(6, 6, 2)
+material = ExtResource("ConcreteMat")
+
+[node name="DoorOpening" type="CSGBox3D" parent="Environment/Geometry/DoorFrame"]
+operation = 2
+size = Vector3(4, 5, 3)
+material = ExtResource("ConcreteMat")
 
 [node name="Pit" type="Node3D" parent="Environment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -18)
+
+[node name="PitDepth" type="CSGBox3D" parent="Environment/Pit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
+use_collision = true
+size = Vector3(10, 20, 10)
+material = ExtResource("ConcreteMat")
+
+[node name="PitHollow" type="CSGBox3D" parent="Environment/Pit/PitDepth"]
+operation = 2
+size = Vector3(8, 22, 8)
+material = ExtResource("ConcreteMat")
 
 [node name="Cover" type="CSGBox3D" parent="Environment/Pit"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
-size = Vector3(4, 0.2, 4)
-material = SubResource("Mat_Floor")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+size = Vector3(4.2, 0.2, 1)
+material = ExtResource("ConcreteMat")
 
 [node name="FallPortal" type="Area3D" parent="Environment/Pit"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
 script = ExtResource("4_portal")
 TargetScenePath = "res://_Project/Scenes/Levels/Level_00_Ventricle.tscn"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Pit/FallPortal"]
 shape = SubResource("Shape_Pit")
 
+[node name="Door" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -14)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Door"]
+shape = SubResource("Shape_Door")
+
+[node name="Visuals" type="CSGBox3D" parent="Environment/Door"]
+size = Vector3(4, 5, 0.5)
+material = SubResource("Mat_Floor")
+
+[node name="Lights" type="Node3D" parent="Environment"]
+
+[node name="AltarSpot" type="SpotLight3D" parent="Environment/Lights"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 8, -5)
+light_color = Color(0.8, 0.1, 0.1, 1)
+light_energy = 50.0
+shadow_enabled = true
+spot_range = 25.0
+
+[node name="EntryLight" type="OmniLight3D" parent="Environment/Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 12)
+light_color = Color(0.2, 0.2, 0.5, 1)
+light_energy = 5.0
+shadow_enabled = true
+omni_range = 15.0
+
 [node name="SacrificeAltar" parent="Environment" instance=ExtResource("3_altar_prefab")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, -5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
 RequiredSacrifice = 8
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, 1, 14)
