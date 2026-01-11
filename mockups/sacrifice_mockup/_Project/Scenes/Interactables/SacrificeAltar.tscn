@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://dsxpy8nbal7tn"]
+
+[ext_resource type="Script" uid="uid://v6hbdivwq057" path="res://_Project/Scripts/Systems/Interaction/SacrificeAltar.cs" id="1_script"]
+
+[sub_resource type="BoxShape3D" id="Shape_Altar"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_Altar"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
+metallic = 0.5
+roughness = 0.5
+
+[node name="SacrificeAltar" type="StaticBody3D"]
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1.5, 0, 0, 0, 1, 0, 0, 0, 1.5, 0, 0, 0)
+shape = SubResource("Shape_Altar")
+
+[node name="Visuals" type="CSGBox3D" parent="."]
+material = SubResource("Mat_Altar")
+
+[node name="InteractionZone" type="Area3D" parent="."]
+input_ray_pickable = false
+
+[node name="CollisionShape3D_Trigger" type="CollisionShape3D" parent="InteractionZone"]
+shape = SubResource("Shape_Altar")

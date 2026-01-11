@@ -65,6 +65,22 @@ public partial class PlayerController : CharacterBody3D
             GD.Print($"[PLAYER] EquippedGun Linked: {EquippedGun.Name}");
         }
 
+        // FORCE RAYCAST SETTINGS (Runtime Fix)
+        if (InteractionRay != null)
+        {
+            InteractionRay.Enabled = true;
+            InteractionRay.CollideWithBodies = true;
+            InteractionRay.CollideWithAreas = true;
+            InteractionRay.HitFromInside = true; // Crucial for close range interaction
+            InteractionRay.TargetPosition = new Vector3(0, 0, -4); // 4 Meters Range
+            InteractionRay.AddException(this); // Prevent hitting self
+            GD.Print("[PLAYER] InteractionRay settings enforced via Code (HitFromInside=True, ExcludeSelf).");
+        }
+        else
+        {
+            GD.PrintErr("[PLAYER] InteractionRay is NULL in _Ready!");
+        }
+
         StateNormal = new NormalState();
         StateCrawl = new CrawlingState();
         
@@ -252,16 +268,80 @@ public partial class PlayerController : CharacterBody3D
     {
         if (Input.IsActionJustPressed("interact"))
         {
-            if (InteractionRay != null && InteractionRay.IsColliding())
-            {
-                var collider = InteractionRay.GetCollider();
-                GD.Print($"[INTERACTION] Ray hit: {((Node)collider).Name}");
+            GD.Print("[DEBUG] 'Interact' pressed. Checking Proximity...");
 
-                if (collider is Apotemno.Systems.Interaction.SacrificeAltar altar)
+            // 1. Proximity Check (Area3D Overlaps) - Preferred for Altars
+            // We use a small Area3D around the player or just check global overlap?
+            // Simpler: Check RayCast first, but if that fails, check if we are standing in an "InteractionZone"?
+            // Actually, let's reverse: RayCast is precise. Area is broad.
+            
+            // Let's rely on the RayCast first.
+            if (InteractionRay != null)
+            {
+               if (InteractionRay.IsColliding())
+               {
+                   var collider = InteractionRay.GetCollider();
+                   GD.Print($"[DEBUG] Ray Hit: {((Node)collider).Name}");
+                   
+                   if (collider is Apotemno.Systems.Interaction.SacrificeAltar altar)
+                   {
+                       altar.OnInteract();
+                       return;
+                   }
+                   
+                   // New: Check if we hit the "InteractionZone" area of the altar?
+                   // No, RayCasting against Area is tricky if collide_with_areas is true but we want to ignore it for movement.
+                   // Our Ray matches Area.
+               }
+            }
+
+            // 2. Backup: Sphere Query for nearby Altars (The "I am standing right here" check)
+            var spaceState = GetWorld3D().DirectSpaceState;
+            var query = new PhysicsShapeQueryParameters3D();
+            query.Shape = new SphereShape3D() { Radius = 2.0f }; // 2m radius
+            query.Transform = GlobalTransform;
+            query.CollideWithBodies = true;
+            query.CollideWithAreas = true; 
+            
+            var results = spaceState.IntersectShape(query);
+            foreach (var result in results)
+            {
+                var col = result["collider"].As<Node>();
+                Node targetNode = null;
+                
+                // Identify target
+                if (col is Apotemno.Systems.Interaction.SacrificeAltar altarBody)
                 {
-                    altar.OnInteract();
+                    targetNode = altarBody;
+                }
+                else if (col is Area3D area && area.Name == "InteractionZone")
+                {
+                    targetNode = area.GetParent();
+                }
+
+                // If valid target found
+                if (targetNode is Apotemno.Systems.Interaction.SacrificeAltar altar)
+                {
+                     // DIRECTION CHECK: Must look at the altar!
+                     // Get direction from Camera (Head) to Altar center
+                     Vector3 camForward = -PlayerCamera.GlobalTransform.Basis.Z;
+                     Vector3 dirToAltar = (altar.GlobalPosition - PlayerCamera.GlobalPosition).Normalized();
+                     
+                     float dot = camForward.Dot(dirToAltar);
+                     // 0.5 means roughly 60 degrees cone. 0.8 is tighter (approx 35 degrees).
+                     if (dot > 0.6f) 
+                     {
+                         GD.Print($"[DEBUG] Proximity Hit: Valid Altar in View (Dot: {dot:F2})");
+                         altar.OnInteract();
+                         return;
+                     }
+                     else
+                     {
+                         GD.Print($"[DEBUG] Ignored Altar behind/side (Dot: {dot:F2})");
+                     }
                 }
             }
+            GD.Print("[DEBUG] Interaction Failed. Ray missed and no Altar in view.");
         }
     }
 }

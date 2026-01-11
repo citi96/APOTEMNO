@@ -10,8 +10,23 @@ public partial class SacrificeAltar : StaticBody3D
     // The specific sacrifice required (optional, or opens general menu)
     [Export] public SacrificeType RequiredSacrifice { get; set; } = SacrificeType.None; 
     
-    // If not None, we could restrict the menu to only show this option?
-    // For now, let's just Open the Menu when interacted with.
+    public override void _Ready()
+    {
+        // FORCE COLLISION SIZE PROGRAMMATICALLY
+        // This fixes the issue where the scene file auto-deletes the size property.
+        var col = GetNodeOrNull<CollisionShape3D>("CollisionShape3D");
+        if (col != null)
+        {
+            if (col.Shape == null) col.Shape = new BoxShape3D();
+            col.Disabled = false; // Ensure it's active
+            if (col.Shape is BoxShape3D box)
+            {
+                box.Size = new Vector3(1, 1, 1);
+                // GD.Print($"[ALTAR] Enforced Altar Collision Size to (1,1,1) for {Name}");
+            }
+            // GD.Print($"[ALTAR] {Name} Layer: {CollisionLayer}, Mask: {CollisionMask}");
+        }
+    }
 
     public void OnInteract()
     {

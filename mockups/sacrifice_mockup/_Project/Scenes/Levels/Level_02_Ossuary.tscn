@@ -2,15 +2,12 @@
 
 [ext_resource type="Script" uid="uid://cgwui6x6jjm6l" path="res://_Project/Scripts/Levels/LevelOssuaryLogic.cs" id="1_logic"]
 [ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
-[ext_resource type="Script" uid="uid://v6hbdivwq057" path="res://_Project/Scripts/Systems/Interaction/SacrificeAltar.cs" id="3_altar"]
+[ext_resource type="PackedScene" uid="uid://altar_prefab_master" path="res://_Project/Scenes/Interactables/SacrificeAltar.tscn" id="3_altar_prefab"]
 [ext_resource type="Script" uid="uid://beggosduuqk1v" path="res://_Project/Scripts/Systems/Portal.cs" id="4_portal"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Bone"]
 albedo_color = Color(0.9, 0.9, 0.8, 1)
 roughness = 0.8
-
-[sub_resource type="BoxShape3D" id="Shape_Altar"]
-size = Vector3(1.5, 1, 1.5)
 
 [sub_resource type="BoxShape3D" id="Shape_Portal"]
 size = Vector3(3, 3, 3)
@@ -45,20 +42,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -10)
 size = Vector3(5, 3, 5)
 material = SubResource("Mat_Bone")
 
-[node name="Altar_Heart" type="StaticBody3D" parent="Ossuary_Core"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-script = ExtResource("3_altar")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="Ossuary_Core/Altar_Heart"]
-size = Vector3(1.5, 0.5, 1.5)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ossuary_Core/Altar_Heart"]
-shape = SubResource("Shape_Altar")
-
 [node name="Final_Portal_Zone" type="Area3D" parent="Ossuary_Core"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -15)
 visible = false
 script = ExtResource("4_portal")
+TargetScenePath = "res://_Project/Scenes/Levels/Level_Final.tscn"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ossuary_Core/Final_Portal_Zone"]
 shape = SubResource("Shape_Portal")
@@ -66,6 +54,10 @@ shape = SubResource("Shape_Portal")
 [node name="Visuals" type="CSGSphere3D" parent="Ossuary_Core/Final_Portal_Zone"]
 radius = 1.5
 material = SubResource("Mat_Bone")
+
+[node name="SacrificeAltar" parent="Ossuary_Core" instance=ExtResource("3_altar_prefab")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+RequiredSacrifice = 10
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 15)

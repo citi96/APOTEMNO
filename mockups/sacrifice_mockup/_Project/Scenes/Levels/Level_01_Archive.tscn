@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bb6k1ctj7aaf5" path="res://_Project/Scripts/Levels/LevelArchiveLogic.cs" id="1_logic"]
 [ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
-[ext_resource type="Script" uid="uid://v6hbdivwq057" path="res://_Project/Scripts/Systems/Interaction/SacrificeAltar.cs" id="3_altar"]
+[ext_resource type="PackedScene" uid="uid://altar_prefab_master" path="res://_Project/Scenes/Interactables/SacrificeAltar.tscn" id="3_altar_prefab"]
 [ext_resource type="Script" uid="uid://beggosduuqk1v" path="res://_Project/Scripts/Systems/Portal.cs" id="4_portal"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Wood"]
@@ -10,8 +10,6 @@ albedo_color = Color(0.4, 0.25, 0.1, 1)
 
 [sub_resource type="BoxShape3D" id="Shape_Portal"]
 size = Vector3(2, 4, 1)
-
-[sub_resource type="BoxShape3D" id="Shape_Altar"]
 
 [node name="Level_01_Archive" type="Node3D" node_paths=PackedStringArray("HiddenStaircase", "IllusionWall")]
 script = ExtResource("1_logic")
@@ -67,19 +65,14 @@ material = SubResource("Mat_Wood")
 [node name="ToOssuaryPortal" type="Area3D" parent="Library/Hidden_Section/Staircase"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -8)
 script = ExtResource("4_portal")
+TargetScenePath = "res://_Project/Scenes/Levels/Level_02_Ossuary.tscn"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Library/Hidden_Section/Staircase/ToOssuaryPortal"]
 shape = SubResource("Shape_Portal")
 
-[node name="Altar_Eyes" type="StaticBody3D" parent="Library"]
+[node name="SacrificeAltar" parent="Library" instance=ExtResource("3_altar_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-script = ExtResource("3_altar")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="Library/Altar_Eyes"]
-size = Vector3(1, 2, 1)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Library/Altar_Eyes"]
-shape = SubResource("Shape_Altar")
+RequiredSacrifice = 1
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 15)

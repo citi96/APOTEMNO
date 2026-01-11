@@ -1,9 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://levelstart_act1"]
+[gd_scene load_steps=8 format=3 uid="uid://dkthw3jc4aeah"]
 
-[ext_resource type="Script" path="res://_Project/Scripts/Levels/LevelStartLogic.cs" id="1_logic"]
-[ext_resource type="PackedScene" uid="uid://player_controller_3d" path="res://_Project/Scenes/Player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://_Project/Scripts/Systems/Interaction/SacrificeAltar.cs" id="3_altar"]
-[ext_resource type="Script" path="res://_Project/Scripts/Systems/Portal.cs" id="4_portal"]
+[ext_resource type="Script" uid="uid://brlymhmkp25gc" path="res://_Project/Scripts/Levels/LevelStartLogic.cs" id="1_logic"]
+[ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://dsxpy8nbal7tn" path="res://_Project/Scenes/Interactables/SacrificeAltar.tscn" id="3_altar_prefab"]
+[ext_resource type="Script" uid="uid://beggosduuqk1v" path="res://_Project/Scripts/Systems/Portal.cs" id="4_portal"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Floor"]
 albedo_color = Color(0.1, 0.1, 0.1, 1)
@@ -61,16 +61,9 @@ TargetScenePath = "res://_Project/Scenes/Levels/Level_00_Ventricle.tscn"
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Pit/FallPortal"]
 shape = SubResource("Shape_Pit")
 
-[node name="Altar" type="StaticBody3D" parent="Environment"]
+[node name="SacrificeAltar" parent="Environment" instance=ExtResource("3_altar_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, -5)
-script = ExtResource("3_altar")
 RequiredSacrifice = 8
-
-[node name="CSGBox3D" type="CSGBox3D" parent="Environment/Altar"]
-size = Vector3(1, 1, 1)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Altar"]
-shape = SubResource("Shape_Door") 
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)

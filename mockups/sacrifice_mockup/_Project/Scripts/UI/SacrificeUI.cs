@@ -20,11 +20,18 @@ public partial class SacrificeUI : CanvasLayer
 
     public override void _Input(InputEvent @event)
     {
-        // Use Action "sacrifice_menu" (Mapped to K)
+        // Toggle on K
         if (@event.IsActionPressed("sacrifice_menu") && !@event.IsEcho()) 
         {
             GD.Print("[UI] Input Received: sacrifice_menu (K)");
             ToggleMenu();
+        }
+        
+        // Close on ESC
+        if (_isOpen && @event.IsActionPressed("ui_cancel"))
+        {
+             GD.Print("[UI] Input Received: ui_cancel (ESC)");
+             Close();
         }
     }
 

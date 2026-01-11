@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://du7btog2knyf0" path="res://_Project/Scripts/Levels/LevelVentricleLogic.cs" id="1_logic"]
 [ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
-[ext_resource type="Script" uid="uid://v6hbdivwq057" path="res://_Project/Scripts/Systems/Interaction/SacrificeAltar.cs" id="3_altar"]
+[ext_resource type="PackedScene" uid="uid://dsxpy8nbal7tn" path="res://_Project/Scenes/Interactables/SacrificeAltar.tscn" id="3_altar_prefab"]
 [ext_resource type="Script" uid="uid://beggosduuqk1v" path="res://_Project/Scripts/Systems/Portal.cs" id="4_portal"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Metal"]
@@ -10,14 +10,14 @@ albedo_color = Color(0.3, 0.3, 0.35, 1)
 metallic = 0.8
 roughness = 0.4
 
-[sub_resource type="BoxShape3D" id="Shape_Portal"]
-size = Vector3(2, 2, 2)
-
 [sub_resource type="BoxShape3D" id="Shape_ElevatorDoor"]
 size = Vector3(3, 4, 0.2)
 
 [sub_resource type="BoxShape3D" id="Shape_Platform"]
 size = Vector3(3, 0.2, 3)
+
+[sub_resource type="BoxShape3D" id="Shape_Portal"]
+size = Vector3(2, 2, 2)
 
 [node name="Level_00_Ventricle" type="Node3D" node_paths=PackedStringArray("ElevatorDoorVisuals", "ElevatorDoorCollider", "ElevatorPlatform")]
 script = ExtResource("1_logic")
@@ -48,14 +48,9 @@ height = 10.0
 sides = 16
 material = SubResource("Mat_Metal")
 
-[node name="Altar_Parietal" type="StaticBody3D" parent="Geometry"]
+[node name="SacrificeAltar" parent="Geometry" instance=ExtResource("3_altar_prefab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 5)
-script = ExtResource("3_altar")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="Geometry/Altar_Parietal"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Geometry/Altar_Parietal"]
-shape = SubResource("Shape_Portal")
+RequiredSacrifice = 9
 
 [node name="Industrial_Elevator" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
@@ -92,6 +87,7 @@ shape = SubResource("Shape_Platform")
 [node name="ToArchivePortal" type="Area3D" parent="Industrial_Elevator"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("4_portal")
+TargetScenePath = "res://_Project/Scenes/Levels/Level_01_Archive.tscn"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Industrial_Elevator/ToArchivePortal"]
 shape = SubResource("Shape_Portal")

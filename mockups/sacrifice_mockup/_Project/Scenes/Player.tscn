@@ -31,7 +31,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, -0.2, -0.4)
 
 [node name="RayCast3D" type="RayCast3D" parent="Head"]
-target_position = Vector3(0, 0, -2)
+target_position = Vector3(0, 0, -4)
 collide_with_areas = true
 
 [node name="HealthManager" type="Node" parent="."]

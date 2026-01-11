@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://level_final_act5"]
+[gd_scene load_steps=3 format=3 uid="uid://b2qc3kjcwcxkv"]
 
-[ext_resource type="PackedScene" uid="uid://player_controller_3d" path="res://_Project/Scenes/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://cjimm8gl2qcup" path="res://_Project/Scenes/Player.tscn" id="2_player"]
 
 [sub_resource type="StandardMaterial3D" id="Mat_Void"]
 shading_mode = 0
