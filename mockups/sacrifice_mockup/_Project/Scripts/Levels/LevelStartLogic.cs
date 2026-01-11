@@ -1,5 +1,6 @@
 using Godot;
 using Apotemno.Core;
+using Apotemno.Core.Narrative;
 
 namespace Apotemno.Levels;
 
@@ -8,24 +9,34 @@ public partial class LevelStartLogic : Node3D
     [Export] public Node3D DoorVisuals;
     [Export] public CollisionShape3D DoorCollider;
     [Export] public Node3D PitCover; // Visual floor that disappears
+    [Export] public Light3D PitGlow;
+    [Export] public float DoorDropDistance = 2.5f;
+    [Export] public float PitCoverDropDistance = 2.0f;
+    [Export] public float OpenDuration = 1.4f;
+
+    private Vector3 _doorStartPosition;
+    private Vector3 _pitCoverStartPosition;
+    private float _pitGlowStartEnergy;
+    private bool _pathOpened;
 
     public override void _Ready()
     {
-        if (SacrificeManagerGlobal.Instance != null)
-        {
-            SacrificeManagerGlobal.Instance.SacrificePerformed += OnSacrificeperformed;
-        }
+        if (DoorVisuals != null) _doorStartPosition = DoorVisuals.Position;
+        if (PitCover != null) _pitCoverStartPosition = PitCover.Position;
+        if (PitGlow != null) _pitGlowStartEnergy = PitGlow.LightEnergy;
+
+        RegisterSacrificeListener();
+        EnsureGameplayState();
+
+        CallDeferred(nameof(PlayIntroSequence));
     }
 
     public override void _ExitTree()
     {
-        if (SacrificeManagerGlobal.Instance != null)
-        {
-            SacrificeManagerGlobal.Instance.SacrificePerformed -= OnSacrificeperformed;
-        }
+        UnregisterSacrificeListener();
     }
 
-    private void OnSacrificeperformed(int typeInt)
+    private void OnSacrificePerformed(int typeInt)
     {
         var type = (SacrificeType)typeInt;
         if (type == SacrificeType.Blood)
@@ -36,18 +47,105 @@ public partial class LevelStartLogic : Node3D
 
     private void OpenThePath()
     {
-        GD.Print("[LEVEL] Blood spilled. The path opens.");
-        
-        // Animate door opening or just delete for MVP
-        if (DoorVisuals != null) DoorVisuals.Visible = false;
-        if (DoorCollider != null) DoorCollider.Disabled = true;
-        if (PitCover != null) PitCover.Visible = false;
-        
-        // Disable collision on pit cover if it exists (assuming it's a StaticBody container)
-        if (PitCover?.GetParent() is CollisionObject3D col)
+        if (_pathOpened)
         {
-            col.CollisionLayer = 0;
-            col.CollisionMask = 0;
+            return;
         }
+
+        _pathOpened = true;
+        GD.Print("[LEVEL] Blood spilled. The path opens.");
+
+        NarrativeManagerGlobal.Instance?.PlayLine("[center]Il Cenotafio si apre. La carne ricorda.[/center]", 3.0f, true);
+
+        if (DoorCollider != null) DoorCollider.Disabled = true;
+
+        var tween = CreateTween().SetParallel();
+
+        AnimateNodeDrop(tween, DoorVisuals, _doorStartPosition, DoorDropDistance, Tween.TransitionType.Cubic);
+        AnimateNodeDrop(tween, PitCover, _pitCoverStartPosition, PitCoverDropDistance, Tween.TransitionType.Quad);
+        AnimatePitGlow(tween);
+
+        tween.TweenCallback(Callable.From(DisablePitCoverCollision));
+    }
+
+    private async void PlayIntroSequence()
+    {
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+        if (NarrativeManagerGlobal.Instance == null)
+        {
+            return;
+        }
+
+        var introLines = new[]
+        {
+            new DialogueFragment("[center]Respira. Il cemento ti ha già misurato.[/center]", 3.2f, null, true),
+            new DialogueFragment("[center]Segui il battito. Ti chiederà qualcosa.[/center]", 3.0f)
+        };
+
+        foreach (var line in introLines)
+        {
+            NarrativeManagerGlobal.Instance.PlayLine(line);
+        }
+    }
+
+    private void DisablePitCoverCollision()
+    {
+        if (PitCover == null)
+        {
+            return;
+        }
+
+        PitCover.Set("use_collision", false);
+    }
+
+    private void RegisterSacrificeListener()
+    {
+        if (SacrificeManagerGlobal.Instance == null)
+        {
+            return;
+        }
+
+        SacrificeManagerGlobal.Instance.SacrificePerformed += OnSacrificePerformed;
+    }
+
+    private void UnregisterSacrificeListener()
+    {
+        if (SacrificeManagerGlobal.Instance == null)
+        {
+            return;
+        }
+
+        SacrificeManagerGlobal.Instance.SacrificePerformed -= OnSacrificePerformed;
+    }
+
+    private void AnimateNodeDrop(Tween tween, Node3D target, Vector3 startPosition, float distance, Tween.TransitionType transition)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        tween.TweenProperty(target, "position:y", startPosition.Y - distance, OpenDuration)
+            .SetTrans(transition)
+            .SetEase(Tween.EaseType.In);
+    }
+
+    private void AnimatePitGlow(Tween tween)
+    {
+        if (PitGlow == null)
+        {
+            return;
+        }
+
+        tween.TweenProperty(PitGlow, "light_energy", _pitGlowStartEnergy + 15.0f, OpenDuration)
+            .SetTrans(Tween.TransitionType.Sine)
+            .SetEase(Tween.EaseType.Out);
+    }
+
+    private void EnsureGameplayState()
+    {
+        GetTree().Paused = false;
+        Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 }
