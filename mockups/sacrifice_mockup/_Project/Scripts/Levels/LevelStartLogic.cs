@@ -25,20 +25,14 @@ public partial class LevelStartLogic : Node3D
         if (PitCover != null) _pitCoverStartPosition = PitCover.Position;
         if (PitGlow != null) _pitGlowStartEnergy = PitGlow.LightEnergy;
 
-        if (SacrificeManagerGlobal.Instance != null)
-        {
-            SacrificeManagerGlobal.Instance.SacrificePerformed += OnSacrificePerformed;
-        }
+        RegisterSacrificeListener();
 
         CallDeferred(nameof(PlayIntroSequence));
     }
 
     public override void _ExitTree()
     {
-        if (SacrificeManagerGlobal.Instance != null)
-        {
-            SacrificeManagerGlobal.Instance.SacrificePerformed -= OnSacrificePerformed;
-        }
+        UnregisterSacrificeListener();
     }
 
     private void OnSacrificePerformed(int typeInt)
@@ -66,26 +60,9 @@ public partial class LevelStartLogic : Node3D
 
         var tween = CreateTween().SetParallel();
 
-        if (DoorVisuals != null)
-        {
-            tween.TweenProperty(DoorVisuals, "position:y", _doorStartPosition.Y - DoorDropDistance, OpenDuration)
-                .SetTrans(Tween.TransitionType.Cubic)
-                .SetEase(Tween.EaseType.In);
-        }
-
-        if (PitCover != null)
-        {
-            tween.TweenProperty(PitCover, "position:y", _pitCoverStartPosition.Y - PitCoverDropDistance, OpenDuration)
-                .SetTrans(Tween.TransitionType.Quad)
-                .SetEase(Tween.EaseType.In);
-        }
-
-        if (PitGlow != null)
-        {
-            tween.TweenProperty(PitGlow, "light_energy", _pitGlowStartEnergy + 15.0f, OpenDuration)
-                .SetTrans(Tween.TransitionType.Sine)
-                .SetEase(Tween.EaseType.Out);
-        }
+        AnimateNodeDrop(tween, DoorVisuals, _doorStartPosition, DoorDropDistance, Tween.TransitionType.Cubic);
+        AnimateNodeDrop(tween, PitCover, _pitCoverStartPosition, PitCoverDropDistance, Tween.TransitionType.Quad);
+        AnimatePitGlow(tween);
 
         tween.TweenCallback(Callable.From(DisablePitCoverCollision));
     }
@@ -113,9 +90,53 @@ public partial class LevelStartLogic : Node3D
 
     private void DisablePitCoverCollision()
     {
-        if (PitCover is CSGBox3D coverShape)
+        if (PitCover is CsgShape3D coverShape)
         {
             coverShape.UseCollision = false;
         }
+    }
+
+    private void RegisterSacrificeListener()
+    {
+        if (SacrificeManagerGlobal.Instance == null)
+        {
+            return;
+        }
+
+        SacrificeManagerGlobal.Instance.SacrificePerformed += OnSacrificePerformed;
+    }
+
+    private void UnregisterSacrificeListener()
+    {
+        if (SacrificeManagerGlobal.Instance == null)
+        {
+            return;
+        }
+
+        SacrificeManagerGlobal.Instance.SacrificePerformed -= OnSacrificePerformed;
+    }
+
+    private void AnimateNodeDrop(Tween tween, Node3D target, Vector3 startPosition, float distance, Tween.TransitionType transition)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        tween.TweenProperty(target, "position:y", startPosition.Y - distance, OpenDuration)
+            .SetTrans(transition)
+            .SetEase(Tween.EaseType.In);
+    }
+
+    private void AnimatePitGlow(Tween tween)
+    {
+        if (PitGlow == null)
+        {
+            return;
+        }
+
+        tween.TweenProperty(PitGlow, "light_energy", _pitGlowStartEnergy + 15.0f, OpenDuration)
+            .SetTrans(Tween.TransitionType.Sine)
+            .SetEase(Tween.EaseType.Out);
     }
 }
