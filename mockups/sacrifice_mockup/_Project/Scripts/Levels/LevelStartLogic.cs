@@ -27,7 +27,7 @@ public partial class LevelStartLogic : Node3D
 
         if (SacrificeManagerGlobal.Instance != null)
         {
-            SacrificeManagerGlobal.Instance.SacrificePerformed += OnSacrificeperformed;
+            SacrificeManagerGlobal.Instance.SacrificePerformed += OnSacrificePerformed;
         }
 
         CallDeferred(nameof(PlayIntroSequence));
@@ -37,11 +37,11 @@ public partial class LevelStartLogic : Node3D
     {
         if (SacrificeManagerGlobal.Instance != null)
         {
-            SacrificeManagerGlobal.Instance.SacrificePerformed -= OnSacrificeperformed;
+            SacrificeManagerGlobal.Instance.SacrificePerformed -= OnSacrificePerformed;
         }
     }
 
-    private void OnSacrificeperformed(int typeInt)
+    private void OnSacrificePerformed(int typeInt)
     {
         var type = (SacrificeType)typeInt;
         if (type == SacrificeType.Blood)
@@ -99,13 +99,21 @@ public partial class LevelStartLogic : Node3D
             return;
         }
 
-        NarrativeManagerGlobal.Instance.PlayLine("[center]Respira. Il cemento ti ha già misurato.[/center]", 3.2f, true);
-        NarrativeManagerGlobal.Instance.PlayLine("[center]Segui il battito. Ti chiederà qualcosa.[/center]", 3.0f);
+        var introLines = new[]
+        {
+            new DialogueFragment("[center]Respira. Il cemento ti ha già misurato.[/center]", 3.2f, null, true),
+            new DialogueFragment("[center]Segui il battito. Ti chiederà qualcosa.[/center]", 3.0f)
+        };
+
+        foreach (var line in introLines)
+        {
+            NarrativeManagerGlobal.Instance.PlayLine(line);
+        }
     }
 
     private void DisablePitCoverCollision()
     {
-        if (PitCover is CSGShape3D coverShape)
+        if (PitCover is CSGBox3D coverShape)
         {
             coverShape.UseCollision = false;
         }

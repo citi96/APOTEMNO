@@ -70,32 +70,32 @@ environment = SubResource("Env_Vestibule")
 use_collision = true
 
 [node name="MainChamber" type="CSGBox3D" parent="Environment/Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -5)
-size = Vector3(15, 10, 20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -6)
+size = Vector3(22, 12, 28)
 material = ExtResource("ConcreteMat")
 
 [node name="ChamberHollow" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
 operation = 2
-size = Vector3(13, 8, 18)
+size = Vector3(20, 10, 26)
 material = ExtResource("ConcreteMat")
 
 [node name="Pillar_L1" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -6)
 size = Vector3(2, 8, 2)
 material = ExtResource("ConcreteMat")
 
 [node name="Pillar_R1" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, -4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -6)
 size = Vector3(2, 8, 2)
 material = ExtResource("ConcreteMat")
 
 [node name="Pillar_L2" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 6)
 size = Vector3(2, 8, 2)
 material = ExtResource("ConcreteMat")
 
 [node name="Pillar_R2" type="CSGBox3D" parent="Environment/Geometry/MainChamber"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6)
 size = Vector3(2, 8, 2)
 material = ExtResource("ConcreteMat")
 
@@ -116,28 +116,48 @@ pipe_radius = 0.15
 material = SubResource("Mat_Blood")
 
 [node name="BloodChannel_Left" type="CSGBox3D" parent="Environment/Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.12, -10)
-size = Vector3(0.4, 0.1, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.12, -12)
+size = Vector3(0.4, 0.1, 14)
 material = SubResource("Mat_Blood")
 
 [node name="BloodChannel_Right" type="CSGBox3D" parent="Environment/Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.12, -10)
-size = Vector3(0.4, 0.1, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.12, -12)
+size = Vector3(0.4, 0.1, 14)
 material = SubResource("Mat_Blood")
 
 [node name="EntryPlinth" type="CSGBox3D" parent="Environment/Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 12.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 16)
 size = Vector3(6, 0.3, 4)
 material = SubResource("Mat_Accent")
 
 [node name="CorridorEntry" type="CSGBox3D" parent="Environment/Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 10)
-size = Vector3(4, 5, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 15)
+size = Vector3(4, 5, 16)
 material = ExtResource("ConcreteMat")
 
 [node name="CorridorHollow" type="CSGBox3D" parent="Environment/Geometry/CorridorEntry"]
 operation = 2
-size = Vector3(2.5, 3.5, 11)
+size = Vector3(2.5, 3.5, 18)
+material = ExtResource("ConcreteMat")
+
+[node name="SideChamber_Left" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 3, -2)
+size = Vector3(6, 6, 8)
+material = ExtResource("ConcreteMat")
+
+[node name="SideChamber_Left_Hollow" type="CSGBox3D" parent="Environment/Geometry/SideChamber_Left"]
+operation = 2
+size = Vector3(4.5, 4.5, 6.5)
+material = ExtResource("ConcreteMat")
+
+[node name="SideChamber_Right" type="CSGBox3D" parent="Environment/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3, -2)
+size = Vector3(6, 6, 8)
+material = ExtResource("ConcreteMat")
+
+[node name="SideChamber_Right_Hollow" type="CSGBox3D" parent="Environment/Geometry/SideChamber_Right"]
+operation = 2
+size = Vector3(4.5, 4.5, 6.5)
 material = ExtResource("ConcreteMat")
 
 [node name="Arch_1" type="CSGBox3D" parent="Environment/Geometry/CorridorEntry"]
@@ -151,7 +171,7 @@ size = Vector3(2.5, 1, 0.5)
 material = ExtResource("ConcreteMat")
 
 [node name="DoorFrame" type="CSGBox3D" parent="Environment/Geometry"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -18)
 size = Vector3(6, 6, 2)
 material = ExtResource("ConcreteMat")
 
@@ -161,7 +181,7 @@ size = Vector3(4, 5, 3)
 material = ExtResource("ConcreteMat")
 
 [node name="Pit" type="Node3D" parent="Environment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
 
 [node name="PitDepth" type="CSGBox3D" parent="Environment/Pit"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
@@ -188,7 +208,7 @@ TargetScenePath = "res://_Project/Scenes/Levels/Level_00_Ventricle.tscn"
 shape = SubResource("Shape_Pit")
 
 [node name="Door" type="StaticBody3D" parent="Environment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -18)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Door"]
 shape = SubResource("Shape_Door")
@@ -213,8 +233,22 @@ light_energy = 5.0
 shadow_enabled = true
 omni_range = 15.0
 
+[node name="SideGlow_Left" type="OmniLight3D" parent="Environment/Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3, -2)
+light_color = Color(0.25, 0.15, 0.2, 1)
+light_energy = 2.5
+shadow_enabled = true
+omni_range = 10.0
+
+[node name="SideGlow_Right" type="OmniLight3D" parent="Environment/Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, -2)
+light_color = Color(0.25, 0.15, 0.2, 1)
+light_energy = 2.5
+shadow_enabled = true
+omni_range = 10.0
+
 [node name="PitGlow" type="OmniLight3D" parent="Environment/Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, -22)
 light_color = Color(0.8, 0.1, 0.1, 1)
 light_energy = 0.0
 shadow_enabled = true
@@ -227,7 +261,7 @@ RequiredSacrifice = 8
 [node name="Triggers" type="Node3D" parent="."]
 
 [node name="TriggerEntry" type="Area3D" parent="Triggers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 16)
 collision_layer = 0
 collision_mask = 1
 script = ExtResource("7_trigger")
@@ -252,7 +286,7 @@ OneShot = true
 shape = SubResource("Shape_TriggerNarrow")
 
 [node name="TriggerDoor" type="Area3D" parent="Triggers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -12.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -16.5)
 collision_layer = 0
 collision_mask = 1
 script = ExtResource("7_trigger")
